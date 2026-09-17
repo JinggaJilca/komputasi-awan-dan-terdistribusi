@@ -7,17 +7,29 @@
   - Memahami pitfall
 
   - Menentukan bagian pitfall yang akan diambil masing-masing anggota
-- Perbedaan pendapat (jika ada): ...
+  - Menentukan arsitektur untuk FoodGo
 
+- Perbedaan pendapat (jika ada): 
+
+  - Trade off hanya salah satu pitfall atau mencakup keseluruhan
+  - Terdapat kasus yang memiliki jenis Fallacies of Distributed Computing yang sama
+  - Penggunaan Message-Oriented Middleware (MOM) sebagai arsitektur dinilai kurang tepat karena hanya untuk membantu menyampaikan pesan agar tidak duplikasi
+
+ -  Solusi
+    - Mengidentitfikasi trade-off dari setiap solusi yang dianalisis tiap pitfall
+
+    - Tetap menganalisa masing-masing gejala untuk mengetahui perbedaannya
+
+    - Memilih arsitektur SOA untuk solusi dari FoodGo
+       
 ## [Tanggal diskusi 2]
-- ...
+
+Isi diskusi seperti diskusi 1 di atas
 
 ## Review Silang
 - [Nama] mengomentari analisis [Nama lain]: ...
 
 ## Log Penggunaan AI (Level 2)
-
-> Wajib diisi sesuai kebijakan Level 2 di [`../RUBRIK-UMUM.md`](../RUBRIK-UMUM.md). Tulis "Tidak memakai AI" pada baris pertama jika memang tidak dipakai. Hanya untuk brainstorming ide/outline — bukan untuk kode/analisis/teks akhir.
 
 | Tanggal | Tool AI | Prompt yang diberikan | Ringkasan saran/ide AI | Bagaimana diolah jadi tulisan/kode sendiri |
 |---|---|---|---|---|

@@ -8,7 +8,7 @@
 | Nayyara Aurelia Putri | 103072400097 | Network is Reliable |
 | Jingga Jil Carissa | 103072400121 | Bandwidth is Infinite |
 
-## Pitfall 1: Latency is Zero — ditulis oleh Neista Arsha Javana]
+## Pitfall 1: Latency is Zero — ditulis oleh Neista Arsha Javana
 
 **Bukti di skenario:** "Aplikasi jadi sangat lambat, beberapa permintaan timeout." dan "... tidak ada timeout sama sekali pada pemanggilan antar service (modul pesanan memanggil modul pembayaran dan menunggu tanpa batas waktu."
 
@@ -76,3 +76,7 @@ Melakukan pembatasan lalu lintas juga menyebabkan menurunnya user experience kar
 ## Kesimpulan Kelompok
 
 [Ringkasan: jika FoodGo memperbaiki ketiga pitfall ini, apa arsitektur yang disarankan secara garis besar? Kaitkan dengan Tugas 2.]
+
+
+
+SOA
