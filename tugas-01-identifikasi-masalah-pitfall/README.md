@@ -24,13 +24,23 @@ Memasang timeout (batas waktu) sehingga saat tidak ada respons dalam kurun waktu
 2.Jika modul pembayaran gagal berkali-kali, maka pemanggilan berikutnya akan ditolak dengan cepat tanpa membebani server.r. 
 1
 
-**Trade-off:** Pengguna yang memesan saat sisem pembayaran sedang bermasalah akan langsung ditolak.  ni]
+**Trade-off:** Pengguna yang memesan saat sisem pembayaran sedang bermasalah akan langsung ditolak.
 
 ---
 
-## Pitfall 2: [nama pitfall] — ditulis oleh [nama]
+## Pitfall 2: Network is Reliable — ditulis oleh Nayyara Aurelia Putri
 
-(ulangi struktur di atas)
+**Bukti di skenario:** Tim menemukan bahwa kode mereka menulis asumsi seperti # network is always reliable, no need for retry dan tidak ada timeout sama sekali pada pemanggilan antar service (modul pesanan memanggil modul pembayaran dan menunggu tanpa batas waktu).
+
+**Kenapa ini keliru:** Paket request yang dikirim tidak selalu dapat sampai secara utuh, karena jaringan dapat mengalami packet loss, jitter, maupun terputus secara fisik. Mengasumsikan jaringan selalu andal adalah langkah yang keliru bagi developer, karna ketika gateway pembayaran lambat atau terjadi kesalahan pada jaringan, aplikasi akan terjebak pada infinite atau blocking wait tanpa adanya kepastian status yang jelas.
+
+**Dampak ke FoodGo:** Ketika pesanan melonjak di jam makan siang, modul pesanan akan melakukan pemanggilan secara blocking ke modul pembayaran, karena modul pesanan tidak memasang timeout dan membiarkan threadnya menunggu balasan selamanya. Akhirnya, seluruh thread pool habis, dan membuat incoming request yang lain menjadi tertahan. Hal ini akan berakibat pada aplikasi yang melambat, dan dibutuhkannya scale up pada server.
+
+**Solusi desain awal:** 
+1. Memutus paksa blocking setelah durasi tertentu (misalnya 300 ms) agar thread tidak terjadi blocking selamanya.
+2. Mencegah modul mengirim request secara terus-menerus.
+
+**Trade-off:** FoodGo perlu membayar peningkatan kompleksitas engineering dan operasional, karena system memerlukan implementasi operasi yang menghasilkan hasil yang akhir yang sama meski dijalankan berkali-kali, dan menghindari terjadinya inkonsistensi data.
 
 ---
 
