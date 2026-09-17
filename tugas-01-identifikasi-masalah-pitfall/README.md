@@ -5,7 +5,7 @@
 | Nama | NIM | Kontribusi |
 |---|---|---|
 | Neista Arsha Javana | 103072400067 | Latency is Zero |
-| Nayyara Aurelia Putri | 103072400097 | [pitfall/bagian yang dikerjakan] |
+| Nayyara Aurelia Putri | 103072400097 | Network is Reliable |
 | Jingga Jil Carissa | 103072400121 | Bandwidth is Infinite |
 
 ## Pitfall 1: Latency is Zero — ditulis oleh Neista Arsha Javana]
