@@ -13,18 +13,16 @@
 **Bukti di skenario:** "Aplikasi jadi sangat lambat, beberapa permintaan timeout." dan "... tidak ada timeout sama sekali pada pemanggilan antar service (modul pesanan memanggil modul pembayaran dan menunggu tanpa batas waktu."
 
 
-**Kenapa ini keliru**: Asumsi bahwa latency is zero merupakan analisa yang keliru, karena komunikasi melalui jaringan tidak dapat terjadi secara instan dan selalu membutuhkan waktu. Asumsi ini dapat memicu terjadinya kelumpuhan pada aplikasi karena proses yang terhambat. Tidak adanya timeout menyebabkan thread server mengalami blocking karena menunggu balasan dari modul lain tanpa batas waktu (tidak adanya timeout). Penumpukan thread ini menyebabkan aplikasi sangat lambat, antrian pengguna bertumpuk, dan sistem mengalami crash.an]
+**Kenapa ini keliru**: Asumsi bahwa latency is zero merupakan analisa yang keliru, karena komunikasi melalui jaringan tidak dapat terjadi secara instan dan selalu membutuhkan waktu. Asumsi ini dapat memicu terjadinya kelumpuhan pada aplikasi karena proses yang terhambat. Tidak adanya timeout menyebabkan thread server mengalami blocking karena menunggu balasan dari modul lain tanpa batas waktu (tidak adanya timeout). Penumpukan thread ini menyebabkan aplikasi sangat lambat, antrian pengguna bertumpuk, dan sistem mengalami crash
 
 **Dampak ke FoodGo**: Ketiadaan timeout membuat thread di modul pesanan terhenti (mengalami blocking) karena terus menunggu respon dari modul pembayaran dengan waktu tanpa batas. Saat jam makan siang, penumpukkan thread yang menggantung ini dapat menghabiskan kapasitas pemrosesan server, sehingga aplikasi berjalan dengan sangat lambat. pesanan baru bertumpuk, dan proses server akhirnya mengalami crash.  
 
 **Solusi desain awal:**
-. 
-1. 
-Memasang timeout (batas waktu) sehingga saat tidak ada respons dalam kurun waktu tertentu, sistem akan langsung memutus koneksi secara sepihak dan membebaskan thread serve
-2.Jika modul pembayaran gagal berkali-kali, maka pemanggilan berikutnya akan ditolak dengan cepat tanpa membebani server.r. 
-1
 
-**Trade-off:** Pengguna yang memesan saat sisem pembayaran sedang bermasalah akan langsung ditolak.
+1. Memasang timeout (batas waktu) sehingga saat tidak ada respons dalam kurun waktu tertentu, sistem akan langsung memutus koneksi secara sepihak dan membebaskan thread server
+2. Jika modul pembayaran gagal berkali-kali, maka pemanggilan berikutnya akan ditolak dengan cepat tanpa membebani server
+
+**Trade-off:** Pengguna yang memesan saat sistem pembayaran sedang bermasalah akan langsung ditolak.
 
 ---
 

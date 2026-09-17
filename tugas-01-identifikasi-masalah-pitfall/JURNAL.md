@@ -1,10 +1,12 @@
 # Jurnal Proses — Tugas 1
 
-> Isi jurnal ini selama proses diskusi berlangsung, bukan ditulis ulang rapi di akhir. Tulis dengan gaya bebas — poin diskusi, kebuntuan, perubahan pikiran.
 
-## [Tanggal diskusi 1]
-- Peserta: [nama-nama yang hadir]
-- Poin diskusi: ...
+## Kamis, 17 September 2026
+- Peserta: Jingga Jil Carissa, Nayyara Aurelia Putri, Neista Arsha Javana
+- Poin diskusi: 
+  - Memahami pitfall
+
+  - Menentukan bagian pitfall yang akan diambil masing-masing anggota
 - Perbedaan pendapat (jika ada): ...
 
 ## [Tanggal diskusi 2]
