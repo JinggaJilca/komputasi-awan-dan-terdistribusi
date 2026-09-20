@@ -31,7 +31,7 @@
 
 - Perbedaan pendapat (jika ada): 
 
- 
+  - Mengapa memakai arsitektur SOA karena terbagi menjadi beberapa modul, namun memikirkan faktor crash lebih kecil sehingga SOA dinilai efisien
 - Solusi
 
 ## Review Silang
