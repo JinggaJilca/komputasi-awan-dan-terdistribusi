@@ -36,7 +36,8 @@
 
 ## Review Silang
 - Jingga Jil Carissa mengomentari analisis Neista Arsha Javana (Pitfall 1): "Latency is Zero"
- menurut saya sangat mustahil aplikasi menghilangkan latensi karena sangat bergantung pada sinyal, perangkat keras dan sistem operasi. Namun hal tersebut dapat ditangani dengan menerapkan latensi yang rendah dan masih bisa ditolerir oleh pengguna sekitar di bawah 40 ms. Atau menerapkan metode caching agar data dapat diakses lebih cepat atau mengubah arsitektur dan komunikasi 
+ menurut saya sangat mustahil aplikasi menghilangkan latensi karena sangat bergantung pada sinyal, perangkat keras dan sistem operasi. Namun hal tersebut dapat ditangani dengan menerapkan latensi yang rendah dan masih bisa ditolerir oleh pengguna sekitar di bawah 40 ms. Atau menerapkan metode caching agar data dapat diakses lebih cepat atau mengubah arsitektur dan komunikasi
+- Neista Arsha Javana mengomentari analisis Nayyara Aurelia Putri (Pitfall 2): "Network is Reliable". Menurut saya, scale up pada sever tidak menyelesaikan masalah, karena pada akhirnya thread server tetap akan habis dan malah mengabiskan resource.
 ## Log Penggunaan AI (Level 2)
 
 | Tanggal | Tool AI | Prompt yang diberikan | Ringkasan saran/ide AI | Bagaimana diolah jadi tulisan/kode sendiri |
@@ -44,7 +45,7 @@
 |17 September 2026 | Gemini | Jelaskan seluruh 8 Fallacies of Distributed Computing beserta kasus pada dunia nyata | Memberikan penjelasan komprehensif mengenai 8 asumsi keliru jaringan beserta contoh kasus di sistem nyata | Menggunakan penjelasan sebagai dasar pemahaman studi untuk kasus skenario FoodGo |
 |17 September 2026|Gemini|Koreksi analisis saya mengenai pitfall pada bandwith is infinite dengan keterkaitannya RAM/CPU crash|Meluruskan bahwa bandwidth overload tidak langsung memicu crash CPU/RAM, melainkan menumpuk request di buffer hingga pemicu Out of Memory (OOM)|Asumsi bahwa bandwidth tidak terbatas (bandwidth is infinite) berisiko memicu kemacetan jaringan (network congestion) saat terjadi lonjakan pengguna. Batas bandwidth yang terlampaui membuat paket data tertahan di antrean memori. Penumpukan koneksi yang tertahan ini memaksa server mengalokasikan RAM dan thread secara berlebihan hingga memicu kondisi Out of Memory (OOM) dan crash pada sistem.|
 |17 September 2026|Gemini|Jelaskan mengenai penyebab terjadinya deadlock dan hubungannya dengan lonjakan request|Menjelaskan bahwa lonjakan request bukan penyebab utama deadlock, melainkan pemicu (trigger) munculnya bug locking pada kode (Coffman Conditions).|Memahami analisis deadlock pada asumsi Bandwith is Infinite dan mekanisme kegagalannya pada kasus FoodGo|
-|---|---|---|---|---|
+|17 September 2026|Gemini|Apa solusi desain awal untuk mengatasi thread blocking akibat ketiadaan timeout pada pemanggilan antar modul, dan apa trade off yang dikorbankan?|Solusi awalnya yaitu memberikan timeout dan menggunakan prinsip circuit breaker pattern. trade offnya adalah mengorbanan keberhasilan transaksi sementara (fail-fast) dan kenyamanan serta waktu pengguna demi menjaga seluruh sistem.|Menulis ulang penjelasan dengan bahasa sendiri, menyesuaikannya dengan studi kasus FoodGo, serta memperjelas dampak kegagalan transaksi (fail-fast) pada user experience dan potensi pendapatan.|
 |---|---|---|---|---|
 |---|---|---|---|---|
 
