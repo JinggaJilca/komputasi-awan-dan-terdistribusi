@@ -5,7 +5,6 @@
 - Peserta: Jingga Jil Carissa, Nayyara Aurelia Putri, Neista Arsha Javana
 - Poin diskusi: 
   - Memahami pitfall
-
   - Menentukan bagian pitfall yang akan diambil masing-masing anggota
   - Menentukan arsitektur untuk FoodGo
 
@@ -27,14 +26,10 @@
 - Peserta: Jingga Jil Carissa, Nayyara Aurelia Putri, Neista Arsha Javana
 - Poin diskusi: 
   - Memberikan tanggapan terhadap masing-masing analisis pitfall
-  - 
 
 - Perbedaan pendapat (jika ada): 
 
-  - Mengapa memakai arsitektur SOA dibandingkan arsitektur lainnya
-  
-- Solusi:
-  - karena terbagi menjadi beberapa modul, dan faktor crash lebih kecil sehingga SOA dinilai efisien
+  - Mengapa memakai arsitektur SOA karena terbagi menjadi beberapa modul, dan faktor crash lebih kecil sehingga SOA dinilai efisien
 
 ## Review Silang
 - Jingga Jil Carissa mengomentari analisis Neista Arsha Javana (Pitfall 1): "Latency is Zero"
