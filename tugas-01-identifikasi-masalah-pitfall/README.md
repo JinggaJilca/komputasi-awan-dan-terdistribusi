@@ -28,9 +28,9 @@
 
 ## Pitfall 2: Network is Reliable — ditulis oleh Nayyara Aurelia Putri
 
-**Bukti di skenario:** Tim menemukan bahwa kode mereka menulis asumsi seperti # network is always reliable, no need for retry dan tidak ada timeout sama sekali pada pemanggilan antar service (modul pesanan memanggil modul pembayaran dan menunggu tanpa batas waktu).
+**Bukti di skenario:** "Tim menemukan bahwa kode mereka menulis asumsi seperti # network is always reliable, no need for retry dan tidak ada timeout sama sekali pada pemanggilan antar service (modul pesanan memanggil modul pembayaran dan menunggu tanpa batas waktu)."
 
-**Kenapa ini keliru:** Paket request yang dikirim tidak selalu dapat sampai secara utuh, karena jaringan dapat mengalami packet loss, jitter, maupun terputus secara fisik. Mengasumsikan jaringan selalu andal adalah langkah yang keliru bagi developer, karna ketika gateway pembayaran lambat atau terjadi kesalahan pada jaringan, aplikasi akan terjebak pada infinite atau blocking wait tanpa adanya kepastian status yang jelas.
+**Kenapa ini keliru:** Paket request yang dikirim tidak selalu dapat sampai secara utuh, karena jaringan dapat mengalami packet loss, ketidakstabilan, maupun terputus secara fisik. Mengasumsikan jaringan selalu andal adalah langkah yang keliru bagi developer, karna ketika gateway pembayaran lambat atau terjadi kesalahan pada jaringan, aplikasi akan terjebak pada infinite atau blocking wait tanpa adanya kepastian status yang jelas.
 
 **Dampak ke FoodGo:** Ketika pesanan melonjak di jam makan siang, modul pesanan akan melakukan pemanggilan secara blocking ke modul pembayaran, karena modul pesanan tidak memasang timeout dan membiarkan threadnya menunggu balasan selamanya. Akhirnya, seluruh thread pool habis, dan membuat incoming request yang lain menjadi tertahan. Hal ini akan berakibat pada aplikasi yang melambat, dan dibutuhkannya scale up pada server.
 
@@ -38,15 +38,15 @@
 1. Memutus paksa blocking setelah durasi tertentu (misalnya 300 ms) agar thread tidak terjadi blocking selamanya.
 2. Mencegah modul mengirim request secara terus-menerus.
 
-**Trade-off:** FoodGo perlu membayar peningkatan kompleksitas engineering dan operasional, karena system memerlukan implementasi operasi yang menghasilkan hasil yang akhir yang sama meski dijalankan berkali-kali, dan menghindari terjadinya inkonsistensi data.
+**Trade-off:** FoodGo perlu membayar peningkatan kompleksitas engineering dan operasional, karena sistem memerlukan implementasi operasi yang menghasilkan hasil akhir yang sama meski telah dijalankan berkali-kali, dan menghindari terjadinya inkonsistensi data.
 
 ---
 
 ## Pitfall 3: Bandwidth is Infinite — ditulis oleh Jingga Jil Carissa
 
-**Bukti di skenario:** "Server backend kadang crash total dan perlu di-restart manual"
+**Bukti di skenario:** "Server backend kadang crash total dan perlu di-restart manual".
 
-**Kenapa ini keliru:**  Asumsi bahwa bandwidth tidak terbatas (bandwidth is infinite) berisiko memicu kemacetan jaringan (network congestion) saat terjadi lonjakan pengguna. Batas bandwidth yang terlampaui membuat paket data tertahan di antrean memori. Penumpukan koneksi yang tertahan ini memaksa server mengalokasikan RAM dan thread secara berlebihan hingga memicu kondisi Out of Memory (OOM) dan crash pada sistem
+**Kenapa ini keliru:**  Asumsi bahwa bandwidth tidak terbatas (bandwidth is infinite) berisiko memicu kemacetan jaringan (network congestion) saat terjadi lonjakan pengguna. Batas bandwidth yang terlampaui membuat paket data tertahan di antrean memori. Penumpukan koneksi yang tertahan ini memaksa server mengalokasikan RAM dan thread secara berlebihan hingga memicu kondisi Out of Memory (OOM) dan crash pada sistem.
 
 **Dampak ke FoodGo:** Pada kasus FoodGo, lonjakan pengguna secara tiba-tiba (traffic spike) terjadi akibat diskon promo di jam makan siang. Ketika puluhan ribu pengguna mengakses aplikasi secara bersamaan, terjadi beberapa rentetan masalah teknis:
 
@@ -61,9 +61,9 @@
 
 **Solusi desain awal:** 
 
-1. Pagination dan Optimasi Payload API untuk mengurangi ukuran data dengan membatasi 1 halaman hanya 10 - 20 item 
-2. Kompresi file berupa CDN (Content Delivery Network) agar lebih kecil untuk foto menu, logo toko
-3. Pembatasan Lalu Lintas membatasi jumlah pemintaan misalnya 10 request/detik
+1. Pagination dan Optimasi Payload API untuk mengurangi ukuran data dengan membatasi 1 halaman hanya 10 - 20 item. 
+2. Kompresi file berupa CDN (Content Delivery Network) agar lebih kecil untuk foto menu, logo toko.
+3. Pembatasan Lalu Lintas membatasi jumlah pemintaan misalnya 10 request/detik.
 
 **Trade-off:**
 
@@ -75,4 +75,4 @@ Melakukan pembatasan lalu lintas juga menyebabkan menurunnya user experience kar
 
 ## Kesimpulan Kelompok
 
-[Ringkasan: jika FoodGo memperbaiki ketiga pitfall ini, apa arsitektur yang disarankan secara garis besar? Kaitkan dengan Tugas 2.]
+Untuk mengatasi tiga pitfall tersebut, kami menyarankan FoodGo untuk menggunakan kombinasi arsitektur SOA untuk membagi batas domain antar modul, Pub-Sub via MOM untuk memutus rantai latency ketika peak hour, dilengkapi dengan pagination untuk mencegah bottleneck akibat lonjakan lalu lintas data serta dipadukan dengan bucklehead pattern atau process isolation untuk mencegah server mengalami crash.
