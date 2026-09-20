@@ -75,4 +75,8 @@ Melakukan pembatasan lalu lintas juga menyebabkan menurunnya user experience kar
 
 ## Kesimpulan Kelompok
 
-Untuk mengatasi tiga pitfall tersebut, kami menyarankan FoodGo untuk menggunakan kombinasi arsitektur SOA untuk membagi batas domain antar modul, Pub-Sub via MOM untuk memutus rantai latency ketika peak hour, dilengkapi dengan pagination untuk mencegah bottleneck akibat lonjakan lalu lintas data serta dipadukan dengan bucklehead pattern atau process isolation untuk mencegah server mengalami crash.
+Berdasarkan gejala yang dialami oleh FoodGo, kami menemukan kegagalan sistem yang berasal dari 3 pitfall akibat asumsi yang keliru, seperti jaringan yang selalu andal (network is reliable), latensi yang mendekati nol (latency is zero), dan bandwith yang tidak terbatas (bandwith is infinite). Asumsi ini mengakibatkan terjadinya deadlock dan berujung terjadinya crash pada aplikasi karena banyaknya request saat jam makan siang dan tidak diaturnya waktu tunggu per modul.
+
+Untuk mengatasi 3 pitfall tersebut, kami menyarankan FoodGo menggunakan kombinasi arsitektur SOA untuk membagi batas domain antar modul, MOM (Message-Oriented Middleware) sebagai media komunikasi antar modul, dilengkapi dengan pagination untuk mencegah bottleneck akibat lonjakan lalu lintas data, serta dipadukan mekanisme pemisahan jalur sehingga ketika terjadinya lonjakan beban di salah satu modul tidak perlu dilakukannya reset secara manual.
+
+Dengan menerapkan kombinasi arsitektur tersebut, FoodGo akan menerima trade-off berupa peningkatan kompleksitas serta pembengkakan biaya operasional. Meski demikian, kombinasi arsitektur tersebut dapat membantu FoodGo untuk mengatasi gejala yang ditimbulkan akibat kegagalan sistem, sehingga trade-off yang didapat akan sesuai dengan stabilitas sistem yang diperoleh.
