@@ -58,4 +58,8 @@ Keunggulan kombinasi **SOA + MOM** dalam menangani lonjakan trafik tinggi terlih
 > Kombinasi **SOA + MOM (Hybrid)** paling efisien karena memisahkan lalu lintas pemanggilan data (*read* via SOA + Caching) dan pemrosesan transaksi (*write* via MOM Async Queue). Hasilnya, sistem FoodGo tetap responsif bagi pengguna sekaligus tahan terhadap risiko *crash* saat promo jam makan siang.
 
 
-## Judul Section
+## Analisis Tertulis
+
+Pada tugas 1, FoodGo terkena masalah coupling (ketergantungan) karena seluruh modul digabungkan menjadi 1 program. Penerapan gaya arsitektur SOA (Service Oriented Architecture) yang dikombinasikan dengan MOM (Message Oriented Middleware) mengatasi masalah tersebut dengan melakukan pemisahan layanan (decoupling). Jika sebelumnya modul pesanan, pembayaran, katalog resto, pelanggan, dan kurir dugabung dalam satu proses server, maka dengan gaya arsitektur SOA ini, setiap modul diubah menjadi layanan mandiri (independent services) yang berjalan di proses atau server terpisah. Dengan begitu, risiko downtime total dapat dihilangkan.
+
+Sedangkan, pengombinasian dengan MOM mengurangi ketergantungan waktu. Pada kondisi sebelumnya, modul pesanan memanggil modul lain secara langsung dan menunggu respons secara linier (blocking). Jika modul pembayaran melambat, seluruh proses tertahan dan memicu timeout serta crash pada server Utama. Dengan menggunakan MOM (seperti RabbitMQ atau kafka) yang dikombinasikan dengan SOA, komunikasi diubah menjadi asinkron. Jadi, masing-masing modul tidak lagi terikat secara langsung dengan modul lainnya. Setiap modul (seperti resto dan kurir) akan mengambil antrean sesuai kapasitas masing-masing. Hal ini memastikan gangguan di salah satu modul tidak memengaruhi dan melumpuhkan layanan lainnya.
