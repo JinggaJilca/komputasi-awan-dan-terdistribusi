@@ -57,6 +57,32 @@ Keunggulan kombinasi **SOA + MOM** dalam menangani lonjakan trafik tinggi terlih
 > **Kesimpulan:**  
 > Kombinasi **SOA + MOM (Hybrid)** paling efisien karena memisahkan lalu lintas pemanggilan data (*read* via SOA + Caching) dan pemrosesan transaksi (*write* via MOM Async Queue). Hasilnya, sistem FoodGo tetap responsif bagi pengguna sekaligus tahan terhadap risiko *crash* saat promo jam makan siang.
 
+## Alur Skenario End-To-End FoodGo
+
+0. Pencarian Menu
+- Komponen yang berkomunikasi: Pelanggan -> Modul Katalog (REST).
+- Jenis komunikasi: Sinkron (Request-Response).
+- Pejelasan: Sebelum melakukan transaksi, pelanggan membuka aplikasi untuk melihat daftar menu. Pelanggan mengirimkan HTTP GET Request ke modul katalog, lalu sistem membalas (response) dengan data menu secara real-time.
+
+1. Pembuatan Pesanan
+- Komponen yang berkomunikasi: Pelanggan -> Modul Pesanan (SOA).
+- Jenis komunikasi: Sinkron (Request-Response).
+- Penjelasan: Saat pelanggan memilih menu di keranjang dan menekan tombol "Pesan", aplikasi mengirimkan HTTP POST Request ke modul pesanan. Komunikasi bersifat asinkron karena pelanggan membutuhkan kepastian secara real-time apakah pesanan mereka berhasil dicatat oleh sistem atau mengalami kendala (misalnya stok habis).
+
+2. Pemrosesan Pembayaran
+- Komponen yang berkomunikasi: Modul Pesanan -> Modul Pembayaran (SOA).
+- Jenis komunikasi: Sinkron (Request-Response).
+- Penjelasan: Setelah pesanan diverifikasi, modul pesanan secara langsung memanggil modul pembayaran secara real-time untuk memproses saldo pelanggan. Proses ini wajib bersifat sinkron agar status "pembayaran berhasil atau gagal" langsung diketahui saat itu juga.
+
+3. Pengiriman Event ke Message Broker
+- Komponen yang berkomunikasi: Modul Pembayaran -> Message Broker (MOM).
+- Jenis komunikasi: Asinkron (Publish Event).
+- Penjelasan: Setelah pembayaran berhasil, modul pembayaran tidak menghubungi modul resto dan modul notifikasi/kurir secara manual. Sebaliknya, modul pembayaran cukup mengirimkan pesan sukses ke message broker (MOM). Dengan cara ini, modul pembayaran tidak perlu menunggu modul resto dan modul notifikasi/kurir selesai.
+
+4. Distribusi Tugas ke Resto dan Kurir
+- Komponen yang berkomunikasi: Message Broker (MOM) -> Modul Resto dan Modul Notifikasi/Kurir.
+- Jenis komunikasi: Asinkron (Pub-Sub).
+- Penjelasan: MOM berperan sebagai perantara untuk menyebarkan (broadcast) salinan pesan event secara pararel kepada modul resto dan modul notifikasi/kurir. Ketika menerima pesan tersebut, modul resto dapat menyiapkan pesanan, sedangkan modul notifikasi/kurir akan memproses pencarian serta melakukan penugasan kurir untuk menjemput pesanan.
 
 ## Analisis Tertulis
 
