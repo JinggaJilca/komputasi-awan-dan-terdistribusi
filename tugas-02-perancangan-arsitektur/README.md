@@ -12,11 +12,11 @@
 
 **Kelompok:** Kelompok 2
 
-| Nama | NIM | Kontribusi |
-|---|---|---|
-| Neista Arsha Javana | 103072400067 | Latency is Zero |
-| Nayyara Aurelia Putri | 103072400097 | Network is Reliable |
-| Jingga Jil Carissa | 103072400121 | Bandwidth is Infinite |
+| Nama | NIM |
+|---|---|
+| Neista Arsha Javana | 103072400067 | 
+| Nayyara Aurelia Putri | 103072400097 |
+| Jingga Jil Carissa | 103072400121 |
 
 ## Studi Kasus
 
