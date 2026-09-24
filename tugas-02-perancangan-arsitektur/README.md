@@ -1,6 +1,22 @@
 # Tugas 2 (Pekan 2) — Perancangan Arsitektur untuk FoodGo
 
+
+
+
+
+
+
+
+
 **Materi terkait:** Architectural style (Layered, SOA, Peer-to-Peer, Publish-Subscribe).
+
+**Kelompok:** Kelompok 2
+
+| Nama | NIM | Kontribusi |
+|---|---|---|
+| Neista Arsha Javana | 103072400067 | Latency is Zero |
+| Nayyara Aurelia Putri | 103072400097 | Network is Reliable |
+| Jingga Jil Carissa | 103072400121 | Bandwidth is Infinite |
 
 ## Studi Kasus
 
@@ -13,45 +29,43 @@ Melanjutkan Tugas 1: FoodGo butuh sistem yang **decoupled** agar tim kurir dan t
 3. Jelaskan alur satu skenario penuh secara end-to-end di diagram (misalnya: pelanggan buat pesanan → bayar → resto terima notifikasi → kurir ditugaskan) — tunjukkan komponen mana berkomunikasi dengan siapa, dan **jenis komunikasinya** (sinkron/asinkron, request-response/event).
 4. Analisis tertulis: kenapa gaya ini mengatasi masalah *coupling* dari Tugas 1, dan apa trade-off-nya (mis. Pub-Sub menambah kompleksitas debugging karena alur tidak linear).
 
-## Cara Membuat Diagram (Gratis, Cukup Laptop)
 
-Tidak perlu software berbayar. Dua opsi:
 
-**Opsi A — Mermaid di dalam Markdown (disarankan).** Ditulis sebagai teks biasa di `README.md`, otomatis dirender jadi diagram oleh GitHub — tidak perlu install apa pun.
 
-````markdown
-```mermaid
-graph LR
-  Client[Pelanggan] -->|HTTP request pesan| OrderSvc[Service Pesanan]
-  OrderSvc -->|RPC sinkron| PaymentSvc[Service Pembayaran]
-  OrderSvc -->|publish event OrderCreated| Broker[(Message Broker)]
-  Broker -->|subscribe| NotifSvc[Service Notifikasi Kurir]
-  Broker -->|subscribe| RestoSvc[Service Katalog Resto]
-```
-````
 
-**Opsi B — draw.io / diagrams.net** (gratis, jalan di browser tanpa akun, atau app desktop offline di [app.diagrams.net](https://app.diagrams.net/)). Ekspor sebagai `.png` dan simpan di folder `diagram/`.
+# Hasil Diskusi
 
-## Struktur Submission
+## Usulan Arsitektur  
 
-```
-tugas-02-perancangan-arsitektur/
-├── README.md          # Analisis + diagram Mermaid (jika Opsi A) atau referensi ke diagram/
-├── JURNAL.md
-└── diagram/            # File .png/.drawio jika pakai Opsi B
-```
+Kombinasi **Service-Oriented Architecture (SOA)** dan **Message-Oriented Middleware (MOM)** merupakan arsitektur hybrid yang kami pilih untuk mengatasi permasalahan pada sistem FoodGo. Arsitektur ini dinilai jauh lebih efisien dibandingkan menerapkan arsitektur SOA murni maupun Publish-Subscribe murni secara terpisah.
 
-## Rubrik Penilaian (Tugas 2)
+Melalui pendekatan ini:
+* **SOA** berperan memisahkan fungsi aplikasi menjadi layanan-layanan (*services*) mandiri di mana setiap layanan mewakili fungsi bisnis spesifik.
+* **MOM** bertindak sebagai perantara komunikasi asinkron yang memutus pemanggilan langsung (*direct synchronous call*) antar-layanan.
 
-| Komponen | Bobot | Kriteria |
-|---|---|---|
-| Ketepatan pemilihan gaya arsitektur | 20% | Justifikasi SOA/Pub-Sub sesuai kebutuhan *decoupling* di skenario |
-| Kelengkapan & kejelasan diagram | 30% | Semua komponen kunci ada, jenis komunikasi (sinkron/asinkron) jelas ditandai |
-| Analisis trade-off | 30% | Bukan hanya kelebihan — kekurangan/kompleksitas baru juga dibahas |
-| Proses & kontribusi kelompok | 20% | `JURNAL.md`, commit history |
+Penerapan arsitektur hybrid ini sangat efisien saat lonjakan trafik (*traffic spike*) terjadi. Sebagai contoh, pada alur pemesanan, **Modul Pesanan** tidak perlu menunggu pemrosesan di **Modul Pembayaran** selesai secara sinkron. Pesan transaksi langsung dimasukkan ke dalam antrean MOM, sementara sistem secara instan memberikan respons balasan (*acknowledgment*) ke pengguna. MOM bertindak sebagai peredam kejut (*rate flattening*) yang menampung antrean transaksi tanpa memicu pemblokiran *thread* (*thread blocking*) pada server utama.
 
-## Batasan Penggunaan AI (Level 2)
+---
 
-Kebijakan **Level 2 (AI Assisted Idea Generation & Structuring)** berlaku — lihat [`../RUBRIK-UMUM.md`](../RUBRIK-UMUM.md). Boleh memakai AI untuk brainstorming komponen apa saja yang umum ada di gaya arsitektur SOA/Pub-Sub; **tidak boleh** meminta AI menggambar diagram final atau menuliskan analisis trade-off yang tinggal ditempel. Catat pemakaian AI di "Log Penggunaan AI" pada `JURNAL.md`.
+### Perbandingan Penanganan Lonjakan Trafik
 
-- Diagram Mermaid/draw.io yang "terlalu generik" (identik dengan contoh tutorial di internet tanpa penyesuaian ke kasus FoodGo) akan dinilai rendah pada komponen kelengkapan & kejelasan diagram.
+Keunggulan kombinasi **SOA + MOM** dalam menangani lonjakan trafik tinggi terlihat jelas jika dibandingkan dengan arsitektur lain:
+
+* **SOA Murni (Synchronous):** Gagal akibat akumulasi *blocking thread* yang memicu *Out of Memory* (OOM) dan *crash* pada server.
+* **Publish-Subscribe Murni:** Mampu mengamankan pemrosesan transaksi, tetapi kurang efisien dan memberikan *overhead* tinggi untuk aktivitas yang bersifat *read-heavy*.
+
+> **Kesimpulan:**  
+> Kombinasi **SOA + MOM (Hybrid)** paling efisien karena memisahkan lalu lintas pemanggilan data (*read* via SOA + Caching) dan pemrosesan transaksi (*write* via MOM Async Queue). Hasilnya, sistem FoodGo tetap responsif bagi pengguna sekaligus tahan terhadap risiko *crash* saat promo jam makan siang.
+
+
+## Analisis Tertulis
+
+Pada tugas 1, FoodGo terkena masalah coupling (ketergantungan) karena seluruh modul digabungkan menjadi 1 program. Penerapan gaya arsitektur SOA (Service Oriented Architecture) yang dikombinasikan dengan MOM (Message Oriented Middleware) mengatasi masalah tersebut dengan melakukan pemisahan layanan (decoupling). Jika sebelumnya modul pesanan, pembayaran, katalog resto, pelanggan, dan kurir digabung dalam satu proses server, maka dengan gaya arsitektur SOA ini, setiap modul diubah menjadi layanan mandiri (independent services) yang berjalan di proses atau server terpisah. Dengan begitu, risiko downtime total dapat dihilangkan.
+
+Sedangkan, pengombinasian dengan MOM mengurangi ketergantungan waktu. Pada kondisi sebelumnya, modul pesanan memanggil modul lain secara langsung dan menunggu respons secara linier (blocking). Jika modul pembayaran melambat, seluruh proses tertahan dan memicu timeout serta crash pada server Utama. Dengan menggunakan MOM (seperti RabbitMQ atau kafka) yang dikombinasikan dengan SOA, komunikasi diubah menjadi asinkron. Jadi, masing-masing modul tidak lagi terikat secara langsung dengan modul lainnya. Setiap modul (seperti resto dan kurir) akan mengambil antrean sesuai kapasitas masing-masing. Hal ini memastikan gangguan di salah satu modul tidak memengaruhi dan melumpuhkan layanan lainnya.
+
+**Trade Off**
+
+Pada sistem monolitik, melacak sebuah error lebih mudah karena semua proses berjalan secara berurutan dalam satu log server. Sedangkan, dengan komunikasi asinkron via MOM, alur program menjadi tidak linear. Jika pesanan gagal, tim developer harus melacak pesan tersebut melalui beberapa layanan dan antrean broker, yang membutuhkan alat tambahan (seperti Centralized Logging atau Correlation ID). Pesan juga berisiko mengalami duplikasi atau tertahan di antrean, sehingga harus ditambahkan logika baru (seperti idempotency) untuk mengatasi pemrosesan ganda.
+
+Selain itu, infrastruktur dan biaya operasional harus ditambah. Jika sebelumnya FoodGo hanya perlu memelihara satu server monolitik, sekarang tim harus mengelola beberapa server layanan terpisah, ditambah infrastruktur pengelola antrean seperti RabbitMQ atau Apache Kafka. Jika salah satu komponen message broker mengalami gangguan, seluruh komunikasi asinkron di FoodGo bisa lumpuh, sehingga membutuhkan pengawasan (monitoring) yang lebih ketat.
