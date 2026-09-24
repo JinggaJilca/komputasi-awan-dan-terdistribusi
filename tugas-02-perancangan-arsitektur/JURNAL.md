@@ -3,8 +3,8 @@
 ## Kamis, 24 September 2026
 - Opsi arsitektur yang dipertimbangkan: Service Oriented Architecture (SOA) dan Message Oriented Middleware (MOM)
 - Kenapa akhirnya pilih [SOA + MOM]: Karena mempertimbangan lonjakan traffic, sistem FoodGo harus tetap responsif dengan pengguna dan tahan crash pada promo jam makan siang 
+
 - Revisi diagram (versi 1 → versi 2, apa yang berubah dan kenapa):  Memisahkan jalur read dan write untuk membantu pembacaan alur MOM
-- 
 
 ## Log Penggunaan AI (Level 2)
 | Tanggal | Tool AI | Prompt yang diberikan | Ringkasan saran/ide AI | Bagaimana diolah jadi tulisan/kode sendiri |
