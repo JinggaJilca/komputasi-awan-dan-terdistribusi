@@ -17,7 +17,7 @@ NUM_WORKERS = 10        # jumlah thread pekerja
 processed_count = 0
 
 # TODO 1: Buat objek Lock di sini untuk melindungi `processed_count`.
-# lock = threading.Lock()
+lock = threading.Lock()
 
 
 def process_order(order_id: int) -> None:
@@ -30,11 +30,21 @@ def process_order(order_id: int) -> None:
     # TODO 2: Tambahkan increment `processed_count` DI SINI.
     # Langkah 1: jalankan dulu tanpa lock (increment biasa: processed_count += 1)
     #            dan buktikan hasil akhirnya sering salah (< NUM_ORDERS).
+    
+    # untuk meningkatkan kemungkinan race condition, menambahkan time sleep
+    temp = processed_count
+    # menggunakan sleep untuk delay sehingga race condition terjadi
+    time.sleep(0.0001) 
+    processed_count = temp + 1
+
     # Langkah 2: bungkus increment dengan `with lock:` dan buktikan hasilnya
     #            selalu tepat NUM_ORDERS. Simpan bukti kedua kondisi ini
     #            di JURNAL.md / folder bukti/.
-    pass
-
+    
+    # === WITH LOCK ===
+    # with lock:
+    #     processed_count += 1
+    
 
 def worker(order_ids: list) -> None:
     """Satu thread pekerja memproses sekumpulan order_id."""
@@ -50,6 +60,22 @@ def main() -> None:
     # start semua thread, lalu join semua thread sebelum lanjut.
     threads = []
     # ... isi logika pembagian tugas & pembuatan thread di sini ...
+
+    # membagi pesanan dengan 10 worker
+    ukuran_per_worker = len(order_ids) // NUM_WORKERS #10
+
+    for i in range(NUM_WORKERS):
+        start_index = i * ukuran_per_worker
+
+        if i == NUM_WORKERS - 1:
+            end_index = len(order_ids)  # worker terakhir mengambil sisa pesanan
+        else:
+            end_index = (i + 1) * ukuran_per_worker
+
+        pesanan_worker = order_ids[start_index:end_index]
+        t = threading.Thread(target=worker, args=(pesanan_worker,))
+        threads.append(t)
+        t.start()
 
     for t in threads:
         t.join()
