@@ -32,11 +32,12 @@ def process_order(order_id: int) -> None:
     #            dan buktikan hasil akhirnya sering salah (< NUM_ORDERS).
     
     # untuk meningkatkan kemungkinan race condition, menambahkan time sleep
+    
     # ==== START TANPA LOCK ====
-    # temp = processed_count
-    # # menggunakan sleep untuk delay sehingga race condition terjadi
-    # time.sleep(0.0001) 
-    # processed_count = temp + 1
+    temp = processed_count
+    # menggunakan sleep untuk delay sehingga race condition terjadi
+    time.sleep(0.0001) 
+    processed_count = temp + 1
     # ==== END TANPA LOCK ====
 
     # Langkah 2: bungkus increment dengan `with lock:` dan buktikan hasilnya
@@ -44,8 +45,8 @@ def process_order(order_id: int) -> None:
     #            di JURNAL.md / folder bukti/.
     
     # === START WITH LOCK ===
-    with lock:
-        processed_count += 1
+    # with lock:
+    #     processed_count += 1
     # === END WITH LOCK ===
 
 def worker(order_ids: list) -> None:
