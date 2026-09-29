@@ -1,8 +1,8 @@
 # Jurnal Proses — Tugas 3
 
 ## Percobaan tanpa Lock
-- Hasil `processed_count` yang didapat: ...
-- Kenapa bisa meleset (jelaskan mekanisme race condition dengan kata sendiri): ...
+- Hasil `processed_count` yang didapat: kami mendapati hasil yang sama dengan percobaan tanpa lock (processed_count = 100).
+- Kenapa bisa meleset (jelaskan mekanisme race condition dengan kata sendiri): tanpa menggunakan time.sleep(), thread dapat menyelesaikan seluruh tugasnya sebelum python sempat melakukan melakukan context switch ke thread lain. Hal ini disebut False Impression of Safety, karena kodenya terlihat aman namun tidak thread-safe.
 
 ## Percobaan dengan Lock
 - Hasil `processed_count` setelah perbaikan: ...
