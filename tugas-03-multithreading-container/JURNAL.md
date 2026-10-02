@@ -8,7 +8,7 @@
 - Hasil `processed_count` setelah perbaikan: hasil yang kami dapatkan adalah 100 (sesuai dengan NUM_ORDERS), dan selalu sama setiap dijalankan ulang. Hasilnya selalu benar karena lock menjadikan operasi processed_count += 1 menjadi kode yang hanya boleh dieksekusi oleh satu thread dalam satu waktu. Saat sebuah thread masuk ke critical section, thread lain yang ingin memasuki critical section yang sama akan menunggu (blocking) sampai lock dilepaskan oleh thread sebelumnya. Jadi, proses membaca, menambah, dan menyimpan nilai processed_count selalu selesai secara utuh sebelum thread lain memulai prosesnya, sehingga tidak ada nilai yang tertimpa atau hilang seperti pada percobaan tanpa lock.
 
 ## Kendala Docker
-- Error yang ditemui saat `docker build`/`docker run` dan cara memperbaikinya: ...
+- Error yang ditemui saat mengakses docker dan cara memperbaikinya: terdapat teks "Virtualization support not detected" ketika mengakses docker untuk pertama kalinya setelah instalasi, solusi yang digunakan adalah mengaktivasi fitur virtualisasi, dan menginstall WSL menggunakan command prompt.
 
 ## Log Penggunaan AI (Level 2)
 
