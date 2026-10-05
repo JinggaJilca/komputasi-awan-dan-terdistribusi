@@ -18,18 +18,25 @@ def cek_saldo(user_id: str) -> float:
     user_saldo = saldo_user.get(user_id)
     # Jika user_id tidak ada, putuskan sendiri perilakunya (mis. return 0 atau raise error)
     # dan jelaskan keputusan ini di README.md.
-    return user_saldo if user_saldo is not None else 0
+    if user_saldo is None:
+        print(f"{user_id} tidak ditemukan")
+        return 0.0
+
+    return float(user_saldo)
 
 
 def proses_pembayaran(user_id: str, jumlah: float) -> dict:
     """Kurangi saldo user sejumlah `jumlah`. Kembalikan status hasil."""
     # TODO 2: validasi saldo cukup, kurangi saldo_user[user_id], dan kembalikan
     # dict berisi minimal {"status": "sukses"/"gagal", "saldo_akhir": ...}
-    if(cek_saldo(user_id) >= jumlah):
+    if user_id not in saldo_user:
+        return {"status": "gagal user tidak ditemukan", "saldo_akhir": 0}
+    
+    elif (cek_saldo(user_id) >= jumlah):
         saldo_user[user_id] -= jumlah
         return {"status": "sukses","saldo _akhir": saldo_user[user_id]}
     else:
-        return {"status": "gagal","saldo _akhir": saldo_user[user_id]}
+        return {"status": "gagal", "saldo_akhir": saldo_user[user_id]}
     
 
 

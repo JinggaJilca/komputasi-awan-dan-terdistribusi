@@ -15,15 +15,15 @@ def main():
     start = time.time()
     # TODO 2: panggil proxy.cek_saldo("user1") dan cetak hasilnya + waktu tempuh
     #         (buktikan client BENAR-BENAR menunggu sampai server membalas)
-    saldo = proxy.cek_saldo("User1")
+    saldo = proxy.cek_saldo("user4")
     durasi = time.time() - start
 
     print(f"Hasil cek saldo: {saldo}")
     print(f"Waktu tempuh   : {durasi:.4f} detik\n")
 
-    print("Memanggil proses_pembayaran('user1', 20000) ...")
+    print("Memanggil proses_pembayaran('user4', 20000) ...")
     # TODO 3: panggil proxy.proses_pembayaran("user1", 20000) dan cetak hasilnya
-    hasil_bayar = proxy.proses_pembayaran("user1", 20000)
+    hasil_bayar = proxy.proses_pembayaran("user4", 20000)
     print(f"Hasil pembayaran: {hasil_bayar}")
 
 
