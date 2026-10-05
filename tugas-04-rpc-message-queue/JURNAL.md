@@ -7,6 +7,12 @@ Pada cek_saldo, jika user_id tidak ditemukan, server menampilkan pesan bahwa use
 
 Modul Pesanan bergantung pada modul Pembayaran, baik dari sisi waktu karena harus menunggu balasan, maupun dari sisi ketersediaan karena modul Pembayaran harus aktif. Karena itu RPC cocok untuk cek_saldo dan proses_pembayaran, karena hasil modul sebelumnya menentukan langkah berikutnya. Jika saldo tidak cukup atau pembayaran gagal, pesanan tidak boleh dibuat, sehingga modul Pesanan harus menunggu sampai modul Pembayaran menyatakan berhasil. Namun, RPC tidak cocok untuk notifikasi ke kurir, karena modul Pembayaran tidak membutuhkan jawaban dari kurir dan tidak boleh ikut terhambat olehnya. Jika notifikasi dikirim dengan RPC, modul Pembayaran akan menunggu balasan kurir, sehingga ketika kurir sibuk atau mati, proses pembayaran ikut lambat atau gagal, padahal masalahnya ada di modul lain.
 
+# Jalur MQ
+
+Cek_saldo membutuhkan komunikasi sinkron karena modul pembayaran memerlukan respons secara langsung sebelum transaksi diproses. Sebaliknya, notifikasi "pembayaran berhasil" ke modul kurir dikirim secara asinkron melalui MOM, sehingga modul pembayaran hanya untuk mempublikasikan event ke antrian lalu melanjutkan eksekusi tanpa menunggu modul kurir. Berdasarkan hasil percobaan, waktu publish memunjukkan rata-rata waktu 0.001354 detik, lebih kecil dibandingkan total end-to-end consumer, sehingga dapat di simpulkan bahwa modul pembayaran tidak bergantung pada modul kurir.
+
+Pada pesan "user1", latensi antrean berestimasi 0.050699 detik, lebih tingga daripada user2 dan user3. Hal tersebut kemungkinan berasal dari overhead saat pengiriman pertama broker ke consumer. Setelah itu, latensi perlahan stabil menjadi 0.004755 hingga 0.006064 detik.
+
 - [RPC / MQ / keduanya], alasan: ...
 
 ## Kendala teknis
