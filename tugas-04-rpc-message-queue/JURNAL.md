@@ -7,11 +7,13 @@ Pada cek_saldo, jika user_id tidak ditemukan, server menampilkan pesan bahwa use
 
 Modul Pesanan bergantung pada modul Pembayaran, baik dari sisi waktu karena harus menunggu balasan, maupun dari sisi ketersediaan karena modul Pembayaran harus aktif. Karena itu RPC cocok untuk cek_saldo dan proses_pembayaran, karena hasil modul sebelumnya menentukan langkah berikutnya. Jika saldo tidak cukup atau pembayaran gagal, pesanan tidak boleh dibuat, sehingga modul Pesanan harus menunggu sampai modul Pembayaran memberikan balasan (menyatakan berhasil atau gagal). Namun, RPC tidak cocok untuk notifikasi ke kurir, karena modul Pembayaran tidak membutuhkan jawaban dari kurir dan tidak boleh ikut terhambat olehnya. Jika notifikasi dikirim dengan RPC, modul Pembayaran akan menunggu balasan kurir, sehingga ketika kurir sibuk atau mati, proses pembayaran ikut lambat atau gagal, padahal masalahnya ada di modul lain.
 
-# Jalur MQ
+### Jalur MQ
 
-Cek_saldo membutuhkan komunikasi sinkron karena modul pembayaran memerlukan respons secara langsung sebelum transaksi diproses. Sebaliknya, notifikasi "pembayaran berhasil" ke modul kurir dikirim secara asinkron melalui MOM, sehingga modul pembayaran hanya untuk mempublikasikan event ke antrian lalu melanjutkan eksekusi tanpa menunggu modul kurir. Berdasarkan hasil percobaan, waktu publish memunjukkan rata-rata waktu 0.001354 detik, lebih kecil dibandingkan total end-to-end consumer, sehingga dapat di simpulkan bahwa modul pembayaran tidak bergantung pada modul kurir.
+Fungsi cek_saldo membutuhkan komunikasi sinkron karena modul pembayaran memerlukan respons secara langsung sebelum transaksi diproses. Sebaliknya, notifikasi "pembayaran berhasil" ke modul kurir dikirim secara asinkron melalui MOM. Dengan metode ini, modul pembayaran hanya bertugas untuk mempublikasikan event ke antrian lalu langsung melanjutkan eksekusi tanpa tertahan saat menunggu proses modul kurir. Berdasarkan hasil percobaan, waktu publish pada modul pembayaran memunjukkan rata-rata waktu yang singkat, yaitu 0.001354 detik. Waktu tersebut lebih kecil dibandingkan total end-to-end pada consumer, sehingga dapat di simpulkan bahwa modul pembayaran tidak bergantung pada ketersediaan maupun performa modul kurir.
 
-Pada pesan "user1", latensi antrean berestimasi 0.050699 detik, lebih tingga daripada user2 dan user3. Hal tersebut kemungkinan berasal dari overhead saat pengiriman pertama broker ke consumer. Setelah itu, latensi perlahan stabil menjadi 0.004755 hingga 0.006064 detik.
+Pada pesan pertama "user1", latensi antrean berestimasi 0.050699 detik, lebih tinggi dibandingkan dengan user2 dan user3. Hal tersebut kemungkinan berasal dari overhead saat inisialisasi pertama broker dan consumer. Setelah jaringan stabil, latensi perlahan turun menjadi 0.004755 hingga 0.006064 detik. Ini menunjukkan antrean pesan dapat menangani aliran data tanpa menimbulkan bottleneck.
+
+Sistem ini diperkuat dengan penggunaan durable=True dan DeliveryMode.Persistent, di mana menjamin bahwa data transaksi tidak hilang dari memori meskipun RabbitMQ mengalami restart atau kegagalan sistem mendadak. Selain itu, penggunaan ch.basic_ack() pada consumer memastikan penerapan At-Least-One Delivery, dimana pesan baru terhapus dari antrean jika modul kurir telah sukses menyelesaikan tugasnya. Sehingga jika modul kurir mengalami kendala, RabbitMQ akan menampung pesan dengan amana sampai modul tersebut aktif kembali.
 
 - [RPC / MQ / keduanya], alasan: ...
 
@@ -20,7 +22,7 @@ Pada pesan "user1", latensi antrean berestimasi 0.050699 detik, lebih tingga dar
 
 ## Uji "pesan tidak hilang" (khusus Jalur B)
 - Langkah uji: matikan consumer → jalankan publisher → nyalakan consumer
-- Hasil yang diamati: ...
+- Hasil yang diamati: nilai latensi yang dihasilkan berdurasi 1 sampai 3 detik, hal tersebut menggambarkan adanya waktu jeda sejak pesan di publikasikan oleh publisher hingga consumer diaktifkan kembali. Latensi yang mengecil secara bertahap disebabkan oleh jarak waktu pengiriman yang diberi delay 1 detik untuk setiap pesan. Hasil pengamatan ini membuktikan bahwa durable=True dan DeliveryMode.Persistent terbukti berhasil menyimpan pesan dalam RabbitMQ meskipun consumer sedang tidak aktif dan modul pembayaran tidak bergantung pada status aktif modul kurir sehingga transaksi dapat terus berjalan tanpa hambatan.
 
 ## Log Penggunaan AI (Level 2)
 
