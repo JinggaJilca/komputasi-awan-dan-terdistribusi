@@ -22,7 +22,7 @@ Sistem ini diperkuat dengan penggunaan durable=True dan DeliveryMode.Persistent,
 
 ## Uji "pesan tidak hilang" (khusus Jalur B)
 - Langkah uji: matikan consumer → jalankan publisher → nyalakan consumer
-- Hasil yang diamati: nilai latensi yang dihasilkan berdurasi 1 sampai 3 detik, hal tersebut menggambarkan adanya waktu jeda sejak pesan di publikasikan oleh publisher hingga consumer diaktifkan kembali. Latensi yang mengecil secara bertahap disebabkan oleh jarak waktu pengiriman yang diberi delay 1 detik untuk setiap pesan. Hasil pengamatan ini membuktikan bahwa durable=True dan DeliveryMode.Persistent terbukti berhasil menyimpan pesan dalam RabbitMQ meskipun consumer sedang tidak aktif dan modul pembayaran tidak bergantung pada status aktif modul kurir sehingga transaksi dapat terus berjalan tanpa hambatan.
+- Hasil yang diamati: nilai latensi yang dihasilkan berdurasi 1 sampai 3 detik, hal tersebut menggambarkan adanya waktu jeda sejak pesan di publikasikan oleh publisher hingga consumer diaktifkan kembali. Latensi yang mengecil secara bertahap disebabkan oleh jarak waktu pengiriman yang diberi delay 1 detik untuk setiap pesan. Hasil pengamatan ini membuktikan bahwa durable=True & DeliveryMode.Persistent terbukti berhasil menyimpan pesan dalam RabbitMQ meskipun consumer sedang tidak aktif, dan modul pembayaran terbukti tidak bergantung pada status aktif modul kurir sehingga transaksi dapat terus berjalan tanpa hambatan.
 
 ## Log Penggunaan AI (Level 2)
 
@@ -30,4 +30,5 @@ Sistem ini diperkuat dengan penggunaan durable=True dan DeliveryMode.Persistent,
 
 | Tanggal | Tool AI | Prompt yang diberikan | Ringkasan saran/ide AI | Bagaimana diolah jadi tulisan/kode sendiri |
 |---|---|---|---|---|
+| 5 Oktober 2026 | Claude | Apa yang akan terjadi pada pesan jika broker mengalami crash? opsi apa yang tersedia untuk mencegah hal tersebut | Perlu ditambahkan DeliveryMode.Persistent agar pesan tersimpan ke disk ketika broker mengalami crash | Memahami penggunaan DeliveryMode.Persistent dan menambahkan pengunaannya pada kode |
 | ... | ... | ... | ... | ... |
