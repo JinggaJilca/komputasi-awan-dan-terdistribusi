@@ -39,4 +39,4 @@ Namun, jika harus memilih satu jalur untuk seluruh sistem, jalur yang paling coc
 | Tanggal | Tool AI | Prompt yang diberikan | Ringkasan saran/ide AI | Bagaimana diolah jadi tulisan/kode sendiri |
 |---|---|---|---|---|
 | 5 Oktober 2026 | Claude | Apa yang akan terjadi pada pesan jika broker mengalami crash? opsi apa yang tersedia untuk mencegah hal tersebut | Perlu ditambahkan DeliveryMode.Persistent agar pesan tersimpan ke disk ketika broker mengalami crash | Memahami penggunaan DeliveryMode.Persistent dan menambahkan pengunaannya pada kode |
-| ... | ... | ... | ... | ... |
+| 11 Oktober 2026 | Claude | Operasi mana yang cocok RPC atau MQ, dan apa dampaknya kalau salah pilih? | Cek saldo dan pembayaran cocok RPC, notifikasi kurir cocok MQ. Dijelaskan dampak per operasi bila tertukar | Mengambil poin yang sesuai studi kasus, memahaminya, dan menuliskan dengan pemahaman sendiri |
