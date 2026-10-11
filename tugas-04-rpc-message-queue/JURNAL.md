@@ -16,16 +16,17 @@ Pada pesan pertama "user1", latensi antrean berestimasi 0.050699 detik, lebih ti
 Sistem ini diperkuat dengan penggunaan durable=True dan DeliveryMode.Persistent, di mana menjamin bahwa data transaksi tidak hilang dari memori meskipun RabbitMQ mengalami restart atau kegagalan sistem mendadak. Selain itu, penggunaan ch.basic_ack() pada consumer memastikan penerapan At-Least-One Delivery, dimana pesan baru terhapus dari antrean jika modul kurir telah sukses menyelesaikan tugasnya. Sehingga jika modul kurir mengalami kendala, RabbitMQ akan menampung pesan dengan amana sampai modul tersebut aktif kembali.
 
 ### Perbandingan dan Kesimpulan
+
 RPC dan MQ sama-sama dipakai agar modul bisa saling berkomunikasi, tetapi keduanya punya kelebihan dan kekurangan masing-masing. RPC unggul karena hasilnya bisa didapat saat itu juga dan alurnya mudah diikuti, tetapi pemanggil harus menunggu dan ikut bermasalah kalau penerimanya lambat atau mati. MQ unggul karena pengirim tidak perlu menunggu dan pesan tetap tersimpan di antrean walau penerimanya sedang tidak aktif, tetapi hasilnya tidak datang seketika dan pemasangannya lebih rumit karena butuh broker tambahan. Karena itu, operasi yang tidak membutuhkan balasan lebih cocok memakai MQ, sedangkan operasi yang membutuhkan balasan sebelum bisa melanjutkan lebih cocok memakai RPC.
 
-Selain itu, RPC membuat dua modul saling bergantung, baik soal waktu maupun soal altif atau tidaknya modul lawan. MQ memisahkan keduanya, sehingga modul pengirim tetap berjalan walau modul penerima bermasalah. Dari sisi keamanan pesan, RPC tidak menyimpan permintaan yang gagal, sedangkan MQ menyimpannya di antrean sampai penerima siap. Dari sisi kemudahan, RPC lebih sederhana karena cukup satu panggilan, sementara MQ perlu broker dan pengaturan antrean.
+Selain itu, RPC membuat dua modul saling bergantung, baik soal waktu maupun soal aktif atau tidaknya modul lawan. MQ memisahkan keduanya, sehingga modul pengirim tetap berjalan walau modul penerima bermasalah. Dari sisi keamanan pesan, RPC tidak menyimpan permintaan yang gagal, sedangkan MQ menyimpannya di antrean sampai penerima siap. Dari sisi kemudahan, RPC lebih sederhana karena cukup satu panggilan, sementara MQ perlu broker dan pengaturan antrean.
 
 Untuk operasi di sistem FoodGo, cek_saldo lebih cocok memakai RPC karena modul Pesanan harus tahu saldo cukup atau tidak sebelum melanjutkan. Kalau memakai MQ, Pesanan tidak mendapat jawaban saat itu juga, sehingga alurnya jadi tidak pasti dan pelanggan harus menunggu tanpa kepastian. proses_pembayaran juga lebih cocok memakai RPC karena pesanan hanya boleh dibuat kalau pembayaran berhasil. Kalau memakai MQ, pesanan bisa terbuat sebelum hasil pembayaran jelas, dan karena pesan bisa terkirim ulang, saldo berisiko terpotong dua kali. Sebaliknya, notifikasi “pembayaran berhasil” ke kurir lebih cocok memakai MQ karena modul Pembayaran tidak butuh jawaban dari kurir. Kalau memakai RPC, modul Pembayaran harus menunggu kurir, sehingga saat kurir sibuk atau mati, pembayaran ikut lambat atau gagal padahal masalahnya ada di modul lain.
 
 Namun, jika harus memilih satu jalur untuk seluruh sistem, jalur yang paling cocok adalah MQ. Alasannya, MQ bisa menangani operasi yang tidak butuh balasan secara alami, dan operasi yang butuh balasan pun masih bisa ditangani dengan pola request-reply. Sebaliknya, RPC tidak bisa menyimpan pesan saat penerima mati, sehingga kebutuhan seperti notifikasi kurir sulit dipenuhi. Selain itu, MQ menjaga satu modul yang bermasalah tidak menular ke modul lain. 
 
 ## Kendala teknis
-- Error saat setup (mis. koneksi RabbitMQ ditolak, port bentrok): ...
+- Error saat setup (mis. koneksi RabbitMQ ditolak, port bentrok): Tidak ada kendala teknis
 
 ## Uji "pesan tidak hilang" (khusus Jalur B)
 - Langkah uji: matikan consumer → jalankan publisher → nyalakan consumer
