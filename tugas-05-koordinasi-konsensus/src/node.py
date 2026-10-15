@@ -7,6 +7,9 @@ Logika Bully Algorithm (bagian # TODO) harus kalian lengkapi sendiri.
 Contoh menjalankan (5 terminal terpisah):
     python3 node.py --id 1 --port 5001 --peers 5002,5003,5004,5005
     python3 node.py --id 2 --port 5002 --peers 5001,5003,5004,5005
+    python3 node.py --id 3 --port 5003 --peers 5001,5002,5004,5005
+    python3 node.py --id 4 --port 5004 --peers 5001,5002,5003,5005
+    python3 node.py --id 5 --port 5005 --peers 5001,5002,5003,5004
     ... dst untuk id 3, 4, 5
 """
 
@@ -94,6 +97,9 @@ class Node:
         print(f"[Node {self.node_id}] TODO: mulai election ke peer lebih tinggi: {higher_peers}")
         self.flag_ok.clear()
         """Dipanggil saat node ini mendeteksi leader tidak ada / tidak merespons."""
+        if not higher_peers:
+            self.declare_leader()
+            return
         # TODO 2: kirim "ELECTION" ke SEMUA peer dengan id LEBIH BESAR dari node_id kita.
         for port in higher_peers.values():
             self.send_message(port, "ELECTION")
@@ -113,7 +119,9 @@ class Node:
         # ke SEMUA peer (bukan cuma yang lebih tinggi).
         with self.lock:
             self.leader_id = self.node_id
-            self.send_message("COORDINATOR")
+            for port in self.peers.values():
+                self.send_message(port, "COORDINATOR")
+
         print(f"[Node {self.node_id}] TODO: broadcast COORDINATOR, saya jadi leader")
 
     def monitor_leader(self):
@@ -121,10 +129,22 @@ class Node:
         while True:
             time.sleep(3)
             # TODO 4: jika self.leader_id sudah diketahui, coba ping node tsb
+            with self.lock:
+                current_leader_id = self.leader_id
+
             # (mis. kirim pesan "PING" atau cukup coba connect). Jika gagal
             # (leader mati) dan node ini belum tahu leader baru, panggil
             # start_election().
-            pass
+            if current_leader_id is not None and current_leader_id != self.node_id:
+                leader_port = self.peers.get(current_leader_id)
+
+                if leader_port is not None:
+                    is_leader_alive = self.send_message(leader_port, "PING")
+
+                    if not is_leader_alive:
+                        with self.lock:
+                            self.leader_id = None
+                        threading.Thread(target=self.start_election, daemon=True).start()
 
 
 def main():
