@@ -11,6 +11,7 @@
 ## Skenario 1: Start normal
 - Leader yang terpilih: Node 5 (node ber-ID tertinggi)
 - Log/observasi:
+
 Kelima node dinyalakan satu per satu secara berurutan dari node 1 sampai node 5, dengan masing-masing di terminal terpisah. Tujuan dari program ini adalah memilih satu node yang menjadi leader, yaitu node yang bertugas mengatur antrean pesanan pusat. Pemilihan ini disebut election, dengan aturan node yang hidup dengan ID paling besar yang menang untuk menjadi leader.
 
 Saat node 1 dinyalakan, leader belum ada, sehingga node 1 memulai election dengan mengirim pesan ELECTION ke node 2, 3, 4, dan 5. Namun node-node tersebut belum menyala, sehingga tidak ada satu pun yang membalas. Setelah menunggu selama 2 detik (ELECTION_TIMEOUT), node 1 menyimpulkan bahwa tidak ada node yang lebih besar darinya yang hidup. Maka node 1 menyatakan dirinya sebagai leader dengan mengirim pesan COORDINATOR. Pesan COORDINATOR merupakan pengumuman bahwa hasil election sudah ditentukan dan node tersebut adalah leader.
