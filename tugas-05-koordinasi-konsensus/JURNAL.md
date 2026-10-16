@@ -8,6 +8,8 @@
 | 3 | **Struktur Logika & Scope Variabel** | Penempatan indentasi `if not is_leader_alive:` di luar blok pemeriksaan `leader_port` pada `monitor_leader()`. | Memicu `UnboundLocalError` jika port `None`, serta membuat thread *election* terpicu terus-menerus meski leader masih hidup. | Memasukkan pengecekan status ping dan pemicuan thread *election* tepat di dalam blok `if leader_port is not None:`. |
 | 4 | **Kesalahan Pengiriman Pesan Socket** | Mem-ping port sendiri (`self.port`) serta memanggil `send_message("COORDINATOR")` tanpa argumen port tujuan. | Ping gagal mendeteksi status leader yang sebenarnya dan pesan coordinator gagal terkirim ke semua node. | Mengambil port leader dari `self.peers` dan melakukan *looping* ke seluruh port peer saat melakukan *broadcast* `COORDINATOR`. |
 | 5 | **Sinkronisasi State Antar-Thread** | Lupa mereset `self.flag_ok.clear()` sebelum pemilihan dan lupa mereset `self.leader_id = None` saat leader mati. | Terjadi *race condition* atau pembacaan status pemilihan yang salah akibat membawa nilai dari pemilihan sebelumnya. | Menambahkan `self.flag_ok.clear()` di awal `start_election()` dan mereset `self.leader_id = None` di dalam `with self.lock:` saat ping gagal. |
+| 6 | **Concurrency & Penumpukan Thread** | Memanggil `start_election` didalam blok `if (msg_type == "ELECTION")` pada `on_message`. | Terjadi *penumpukan thread* secara pararel saat node mengirim pesan pemilihan secara bersamaan yang memicu efek berantai. | Menghapus `start_election` didalam blok `if (msg_type == "ELECTION")` pada `on_message` sehingga node yang lebih tinggi cukup membalas "OK" tanpa memicu pemilu baru. |
+
 ## Skenario 1: Start normal
 - Leader yang terpilih: Node 5 (node ber-ID tertinggi)
 - Log/observasi:
@@ -23,8 +25,11 @@
     Di log tidak muncul pesan ELECTION maupun OK, karena node dinyalakan satu per satu dengan jeda cukup lama, jadi node yang lebih besar belum hidup saat election dimulai. Kalau kelima node dinyalakan hampir bersamaan, kedua pesan itu seharusnya muncul, tapi hasil akhirnya tetap node 5.
 
 ## Skenario 2: Leader dimatikan
-- Leader baru yang terpilih: ...
-- Berapa lama waktu sampai leader baru terdeteksi: ...
+- Leader baru yang terpilih: Node 4 (Node ber-ID tertinggi yang tersisa setelah Node 5 dimatikan)
+- Berapa lama waktu sampai leader baru terdeteksi: 3-5 detik. Waktu ini dipengaruhi oleh durasi `monitor_leader`, dan durasi `election_timeout` sebelum deklarasi coordinator di broadcast.
+- Log/observasi: 
+
+    Ketika node 5 dimatikan, node 1 hingga 4 secara berurutan mengirimkan pesan election ke node dengan ID yang lebih tinggi. Setelah menerima balasan OK dari node diatasnya yang masih hidup, node 1 hingga 3 menghentikan proses pemilihan leader. Sementara itu, node 4 tidak mendapat respons saat menghubungi node 5 hingga batas time out habis. Karena merupakan node dengan ID tertinggi yang tersisa, node 4 otomatis mendeklarasikan dirinya sendiri sebagai leader baru dan menyiarkan pesan coordinator ke seluruh node dibawahnya.
 
 ## Log Penggunaan AI (Level 2)
 
