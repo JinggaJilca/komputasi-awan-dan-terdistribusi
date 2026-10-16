@@ -73,7 +73,6 @@ class Node:
             if (self.node_id > sender_id):
                 print(f"[Node {self.node_id}] Menerima pesan '{msg_type}' dari node {sender_id} (ELECTION)")
                 self.send_message(self.peers[sender_id], "OK")
-                threading.Thread(target=self.start_election, daemon=True).start()
 
         #   - "OK": tandai bahwa ada node lebih tinggi yang masih hidup, sehingga
         #     kita TIDAK boleh mendeklarasikan diri sebagai leader.
