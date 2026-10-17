@@ -2,9 +2,22 @@
 
 **Materi terkait:** Physical/Logical Clock, Election Algorithm (Bully/Raft).
 
+**Kelompok:** Kelompok 2
+
+| Nama | NIM |
+|---|---|
+| Neista Arsha Javana | 103072400067 | 
+| Nayyara Aurelia Putri | 103072400097 |
+| Jingga Jil Carissa | 103072400121 |
+
 ## Studi Kasus
 
 Terjadi konflik urutan waktu pada pesanan FoodGo (dua server mencatat urutan pesanan berbeda karena jam tidak sinkron), dan sistem membutuhkan satu **"Node Leader"** untuk mengelola antrean pesanan pusat agar tidak terjadi konflik pemrosesan ganda.
+
+## Hasil Analisis
+### Kenapa perlu leader
+### Trade Off Bully vs Raft
+### Hasil Pengujian 2 skenario
 
 ## Tugas Kelompok
 
