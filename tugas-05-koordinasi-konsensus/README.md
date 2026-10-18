@@ -22,7 +22,12 @@ Hal ini juga yang terjadi pada kasus FoodGo. Dua server mencatat urutan pesanan 
 
 Namun leader juga bisa mati. Jika tidak ada pengganti, antrean pesanan ikut macet. Karena itu dibutuhkan election, yaitu cara otomatis memilih leader baru, supaya sistem tetap berjalan tanpa perbaikan manual.
 
-### Trade Off Bully vs Raft
+### Trade Off Bully Algorithm vs Raft Algorithm
+Bully Algorithm menerapkan perbandingan ID tertinggi untuk menentukan leader. Hal ini dapat di lihat pada pengujian skenario pertama (start normal) di mana node 5 otomatis terpilih sebagai leader, serta pada skenario kedua ketika node 4 berhasil mengambil alih posisi leader dalam waktu 3-5 detik setelah node 5 dimatikan. Sebaliknya, Raft algorithm menggunakan sistem suara terbanyak dan waktu tunggu acak untuk memastikan proses pemilihan berjalan dengan adil dan konsisten. 
+
+Adapun trade off dari kedua algoritma tersebut meliputi:
+1. Bully Algorithm: ketika node dengan ID terendah memulai ELECTION, setiap node di atasnya yang menerima pesan juga akan memulai proses election masing-masing. Hal ini menimbulkan konkurensi serta penumpukan thread. 
+2. Raft Algoritm: memilki logika dan struktur kode yang lebih kompleks dibandingkan bully algorithm.
 
 ### Hasil Pengujian 2 skenario
 Pada skenario pertama (start normal), kelima node dinyalakan satu per satu dari node 1 sampai node 5 di terminal terpisah. Setiap node yang menyala memulai election dengan mengirim ELECTION ke node ber-ID lebih besar. Karena node-node tersebut belum hidup, tidak ada balasan OK, sehingga setelah menunggu 2 detik (ELECTION_TIMEOUT) node itu menyatakan dirinya leader dan mengirim COORDINATOR ke node lain. Akibatnya leader sempat berpindah dari node 1 ke 2, 3, dan 4. Saat node 5 menyala, ia tidak punya node dengan ID lebih besar, sehingga langsung menjadi leader dan mengirim COORDINATOR ke node 1 sampai 4. Hasil akhirnya, node 5 terpilih sebagai leader dan keempat node lain mencatatnya. Pesan ELECTION dan OK tidak muncul di log karena node yang lebih besar belum hidup saat election dimulai. Jika kelima node dinyalakan hampir bersamaan, kedua pesan itu seharusnya muncul, tetapi hasil akhirnya tetap node 5.
