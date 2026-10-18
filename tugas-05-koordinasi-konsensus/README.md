@@ -21,6 +21,7 @@ Terjadi konflik urutan waktu pada pesanan FoodGo (dua server mencatat urutan pes
     Hal ini juga yang terjadi pada kasus FoodGo. Dua server mencatat urutan pesanan yang berbeda karena jam keduanya tidak sinkron, sehingga pesanan yang masuk hampir bersamaan bisa dianggap datang lebih dulu oleh server A, tetapi belakangan oleh server B. Akibatnya pesanan bisa diproses ganda atau dengan urutan yang berbeda. Dengan adanya satu node leader yang mengelola antrean pesanan pusat, semua pesanan diurutkan di satu tempat dan node lain cukup mengikutinya, sehingga urutan tidak lagi bergantung pada jam masing-masing server.
 
     Namun leader juga bisa mati. Jika tidak ada pengganti, antrean pesanan ikut macet. Karena itu dibutuhkan election, yaitu cara otomatis memilih leader baru, supaya sistem tetap berjalan tanpa perbaikan manual.
+    
 ### Trade Off Bully vs Raft
 ### Hasil Pengujian 2 skenario
 
