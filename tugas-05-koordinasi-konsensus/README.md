@@ -16,14 +16,19 @@ Terjadi konflik urutan waktu pada pesanan FoodGo (dua server mencatat urutan pes
 
 ## Hasil Analisis
 ### Kenapa perlu leader
-Dalam sistem terdistribusi, leader adalah satu node yang dipilih untuk memegang kendali atas suatu tugas, sementara node lainnya mengikuti keputusannya. Fungsi utamanya adalah menjadi satu-satunya pusat pengambilan keputusan, misalnya menentukan urutan pekerjaan, sehingga semua node punya acuan yang sama. Tanpa leader, setiap node memutuskan sendiri-sendiri. Karena masing-masing punya jam dan data yang bisa berbeda, jadi hasilnya bisa saling bertentangan sehingga urutan kerja tidak sama dan pekerjaan yang sama bisa diproses lebih dari sekali.
+Dalam sistem terdistribusi, leader adalah satu node yang dipilih untuk memegang kendali atas suatu tugas, sementara node lainnya mengikuti keputusannya. Fungsi utamanya adalah menjadi satu-satunya pusat pengambilan keputusan, misalnya menentukan urutan pekerjaan, sehingga semua node punya acuan yang sama. Tanpa leader, setiap node memutuskan sendiri-sendiri. Masing-masing node bisa memiliki jam dan data yang berbeda, jadi hasilnya bisa saling bertentangan sehingga urutan kerja tidak sama dan pekerjaan yang sama bisa diproses lebih dari sekali.
 
 Hal ini juga yang terjadi pada kasus FoodGo. Dua server mencatat urutan pesanan yang berbeda karena jam keduanya tidak sinkron, sehingga pesanan yang masuk hampir bersamaan bisa dianggap datang lebih dulu oleh server A, tetapi belakangan oleh server B. Akibatnya pesanan bisa diproses ganda atau dengan urutan yang berbeda. Dengan adanya satu node leader yang mengelola antrean pesanan pusat, semua pesanan diurutkan di satu tempat dan node lain cukup mengikutinya, sehingga urutan tidak lagi bergantung pada jam masing-masing server.
 
 Namun leader juga bisa mati. Jika tidak ada pengganti, antrean pesanan ikut macet. Karena itu dibutuhkan election, yaitu cara otomatis memilih leader baru, supaya sistem tetap berjalan tanpa perbaikan manual.
 
 ### Trade Off Bully vs Raft
+
 ### Hasil Pengujian 2 skenario
+Pada skenario pertama (start normal), kelima node dinyalakan satu per satu dari node 1 sampai node 5 di terminal terpisah. Setiap node yang menyala memulai election dengan mengirim ELECTION ke node ber-ID lebih besar. Karena node-node tersebut belum hidup, tidak ada balasan OK, sehingga setelah menunggu 2 detik (ELECTION_TIMEOUT) node itu menyatakan dirinya leader dan mengirim COORDINATOR ke node lain. Akibatnya leader sempat berpindah dari node 1 ke 2, 3, dan 4. Saat node 5 menyala, ia tidak punya node dengan ID lebih besar, sehingga langsung menjadi leader dan mengirim COORDINATOR ke node 1 sampai 4. Hasil akhirnya, node 5 terpilih sebagai leader dan keempat node lain mencatatnya. Pesan ELECTION dan OK tidak muncul di log karena node yang lebih besar belum hidup saat election dimulai. Jika kelima node dinyalakan hampir bersamaan, kedua pesan itu seharusnya muncul, tetapi hasil akhirnya tetap node 5.
+
+Pada skenario kedua (leader dimatikan), node 5 dihentikan dengan Ctrl+C. Node 1 sampai 4 mendeteksi bahwa node 5 tidak merespons PING lewat monitor_leader, lalu masing-masing memulai election. Node 1 sampai 3 menerima balasan OK dari node di atasnya yang masih hidup, sehingga mereka berhenti mencalonkan diri. Node 4 tidak mendapat balasan dari node 5 sampai batas waktu habis, jadi ia menyatakan dirinya leader baru dan mengirim COORDINATOR ke semua node yang masih hidup. Node 4 terpilih sebagai leader baru, yaitu node ber-ID tertinggi yang tersisa. Waktu sampai leader baru terpilih sekitar 2 sampai 5 detik, dipengaruhi interval pengecekan monitor_leader (3 detik) dan ELECTION_TIMEOUT (2 detik). Karena beberapa node memicu election hampir bersamaan, pesan COORDINATOR dari node 4 bisa muncul lebih dari sekali di log, tetapi hasil akhirnya tetap node 4.
+
 
 ## Tugas Kelompok
 
