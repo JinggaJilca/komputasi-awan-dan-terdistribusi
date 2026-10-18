@@ -16,12 +16,12 @@ Terjadi konflik urutan waktu pada pesanan FoodGo (dua server mencatat urutan pes
 
 ## Hasil Analisis
 ### Kenapa perlu leader
-    Dalam sistem terdistribusi, leader adalah satu node yang dipilih untuk memegang kendali atas suatu tugas, sementara node lainnya mengikuti keputusannya. Fungsi utamanya adalah menjadi satu-satunya pusat pengambilan keputusan, misalnya menentukan urutan pekerjaan, sehingga semua node punya acuan yang sama. Tanpa leader, setiap node memutuskan sendiri-sendiri. Karena masing-masing punya jam dan data yang bisa berbeda, jadi hasilnya bisa saling bertentangan sehingga urutan kerja tidak sama dan pekerjaan yang sama bisa diproses lebih dari sekali.
+Dalam sistem terdistribusi, leader adalah satu node yang dipilih untuk memegang kendali atas suatu tugas, sementara node lainnya mengikuti keputusannya. Fungsi utamanya adalah menjadi satu-satunya pusat pengambilan keputusan, misalnya menentukan urutan pekerjaan, sehingga semua node punya acuan yang sama. Tanpa leader, setiap node memutuskan sendiri-sendiri. Karena masing-masing punya jam dan data yang bisa berbeda, jadi hasilnya bisa saling bertentangan sehingga urutan kerja tidak sama dan pekerjaan yang sama bisa diproses lebih dari sekali.
 
-    Hal ini juga yang terjadi pada kasus FoodGo. Dua server mencatat urutan pesanan yang berbeda karena jam keduanya tidak sinkron, sehingga pesanan yang masuk hampir bersamaan bisa dianggap datang lebih dulu oleh server A, tetapi belakangan oleh server B. Akibatnya pesanan bisa diproses ganda atau dengan urutan yang berbeda. Dengan adanya satu node leader yang mengelola antrean pesanan pusat, semua pesanan diurutkan di satu tempat dan node lain cukup mengikutinya, sehingga urutan tidak lagi bergantung pada jam masing-masing server.
+Hal ini juga yang terjadi pada kasus FoodGo. Dua server mencatat urutan pesanan yang berbeda karena jam keduanya tidak sinkron, sehingga pesanan yang masuk hampir bersamaan bisa dianggap datang lebih dulu oleh server A, tetapi belakangan oleh server B. Akibatnya pesanan bisa diproses ganda atau dengan urutan yang berbeda. Dengan adanya satu node leader yang mengelola antrean pesanan pusat, semua pesanan diurutkan di satu tempat dan node lain cukup mengikutinya, sehingga urutan tidak lagi bergantung pada jam masing-masing server.
 
-    Namun leader juga bisa mati. Jika tidak ada pengganti, antrean pesanan ikut macet. Karena itu dibutuhkan election, yaitu cara otomatis memilih leader baru, supaya sistem tetap berjalan tanpa perbaikan manual.
-    
+Namun leader juga bisa mati. Jika tidak ada pengganti, antrean pesanan ikut macet. Karena itu dibutuhkan election, yaitu cara otomatis memilih leader baru, supaya sistem tetap berjalan tanpa perbaikan manual.
+
 ### Trade Off Bully vs Raft
 ### Hasil Pengujian 2 skenario
 
