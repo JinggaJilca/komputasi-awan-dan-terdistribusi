@@ -38,9 +38,11 @@ class ChordRing:
         
         #Mengeluarkan node_id (sementara) untuk menemukan successor lama
         self.nodes.pop(node_id)
-        successor_lama_id, _ = self.find_successor(node_id)
-        #Memasukkan kembali node_id ke self.nodes
-        self.nodes[node_id] = node_ip
+        successor_lama_id = self.find_successor(node_id)
+        if successor_lama_id is None:
+            print(f"[JOIN] Node '{node_name}' (id={node_id}) bergabung, alamat {node_ip}. Tidak ada successor lama.")
+            self.nodes[node_id] = node_ip  
+            return
 
         # TODO 3: pindahkan semua key di self.data yang seharusnya menjadi
         # tanggung jawab node baru (key dengan hash <= node_id, tapi masih
@@ -49,7 +51,7 @@ class ChordRing:
         # tidak perlu benar-benar memindahkan struktur data kompleks.)
 
         for key_hash, (kurir_id, _) in list(self.data.items()):
-            penanggung_jawab_id, _  = self.find_successor(key_hash)
+            penanggung_jawab_id  = self.find_successor(key_hash)
 
             if penanggung_jawab_id == node_id:
                 print(
@@ -75,11 +77,11 @@ class ChordRing:
                 break
 
             self.nodes[node_id] = node_ip
-            sucessor_lama_id, _ = self.find_successor(key_hash)
+            sucessor_lama_id = self.find_successor(key_hash)
             del self.nodes[node_id]
 
             if sucessor_lama_id == node_id:
-                sucessor_baru_id, _ = self.find_successor(key_hash)
+                sucessor_baru_id = self.find_successor(key_hash)
                 print(
                     f"[LEAVE] Node '{node_name}' (id={node_id}) memindahkan data kurir '{kurir_id}' (hash={key_hash}) ke node {sucessor_baru_id}"
                 )
@@ -92,6 +94,8 @@ class ChordRing:
         ke node dengan hash terkecil di ring (karena ring melingkar)."""
         # TODO 6: implementasikan logika successor di atas menggunakan
         # self.nodes.keys(). Kembalikan node_id (bukan IP).
+        if not self.nodes:
+            return None
         
         nodes_id = sorted(self.nodes.keys())
         for node_id in nodes_id:
