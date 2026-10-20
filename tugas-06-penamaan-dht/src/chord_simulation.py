@@ -112,7 +112,11 @@ class ChordRing:
         key_hash = hash_id(kurir_id)
         # TODO 8: gunakan find_successor(key_hash) untuk menemukan node
         # penanggung jawab, lalu kembalikan ip_kurir dari self.data jika ada.
-        pass
+        node_id = self.find_successor(key_hash)
+        record = self.data.get(key_hash)
+        if record is None or record [0] != kurir_id;
+            return None
+        return record[1]
 
 
 def main():
