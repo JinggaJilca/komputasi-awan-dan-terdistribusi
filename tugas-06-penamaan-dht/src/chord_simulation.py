@@ -40,9 +40,10 @@ class ChordRing:
         self.nodes.pop(node_id)
         successor_lama_id = self.find_successor(node_id)
         if successor_lama_id is None:
-            print(f"[JOIN] Node '{node_name}' (id={node_id}) bergabung, alamat {node_ip}. Tidak ada successor lama.")
-            self.nodes[node_id] = node_ip  
-            return
+            successor_lama_id = node_id 
+        
+        self.nodes[node_id] = node_ip  
+            
 
         # TODO 3: pindahkan semua key di self.data yang seharusnya menjadi
         # tanggung jawab node baru (key dengan hash <= node_id, tapi masih
@@ -97,12 +98,12 @@ class ChordRing:
         if not self.nodes:
             return None
         
-        nodes_id = sorted(self.nodes.keys())
-        for node_id in nodes_id:
+        sorted_id = sorted(self.nodes.keys())
+        for node_id in sorted_id:
             if node_id >= key_hash:
                 return node_id
                     
-        return nodes_id[0]
+        return sorted_id[0]
 
     def register_kurir(self, kurir_id: str, ip_kurir: str):
         """Simpan mapping ID Kurir -> IP di node yang bertanggung jawab."""
