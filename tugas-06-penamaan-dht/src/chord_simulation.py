@@ -114,7 +114,7 @@ class ChordRing:
         # penanggung jawab, lalu kembalikan ip_kurir dari self.data jika ada.
         node_id = self.find_successor(key_hash)
         record = self.data.get(key_hash)
-        if record is None or record [0] != kurir_id;
+        if record is None or record [0] != kurir_id:
             return None
         return record[1]
 
