@@ -75,7 +75,7 @@ class ChordRing:
                 break
 
             self.nodes[node_id] = node_ip
-            sucessor_lama_id, _ = self.find_sucessor(key_hash)
+            sucessor_lama_id, _ = self.find_successor(key_hash)
             del self.nodes[node_id]
 
             if sucessor_lama_id == node_id:
