@@ -26,17 +26,17 @@ python3 src/chord_simulation.py
 
 ## Tugas Analisis (`README.md`)
 
-Jelaskan **kenapa DHT/Chord** lebih cocok untuk kasus ini dibanding **flat naming sederhana** (mis. tabel pusat ID→IP) atau **DNS konvensional** — kaitkan dengan sifat "IP kurir sering berubah" dan kebutuhan tanpa titik gagal tunggal. (Neista)
+Soal 1: Jelaskan **kenapa DHT/Chord** lebih cocok untuk kasus ini dibanding **flat naming sederhana** (mis. tabel pusat ID→IP) atau **DNS konvensional** — kaitkan dengan sifat "IP kurir sering berubah" dan kebutuhan tanpa titik gagal tunggal. (Neista)
 
-### Jawaban:
+#### Jawaban No.1:
 
-Gambarkan (boleh pakai Mermaid, lihat Tugas 2) ring topology dari simulasi kalian, tandai node mana yang bertanggung jawab atas ID Kurir mana. (Nayya)
+Soal 2: Gambarkan (boleh pakai Mermaid, lihat Tugas 2) ring topology dari simulasi kalian, tandai node mana yang bertanggung jawab atas ID Kurir mana. (Nayya)
 
-### Jawaban:
+#### Jawaban No.2:
 
-Jelaskan apa yang terjadi pada mapping saat sebuah node **keluar** dari ring (siapa yang mengambil alih tanggung jawabnya) — dukung dengan output program.
+Soal 3: Jelaskan apa yang terjadi pada mapping saat sebuah node **keluar** dari ring (siapa yang mengambil alih tanggung jawabnya) — dukung dengan output program.
 
-### Jawaban:
+#### Jawaban No.3:
 Didapatkan output program sebagai berikut:
 ```bash
 [JOIN] Node 'node-jakarta-1' (id=177) bergabung, alamat 10.0.0.1
