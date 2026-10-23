@@ -34,9 +34,53 @@ Gambarkan (boleh pakai Mermaid, lihat Tugas 2) ring topology dari simulasi kalia
 
 ### Jawaban:
 
-Jelaskan apa yang terjadi pada mapping saat sebuah node **keluar** dari ring (siapa yang mengambil alih tanggung jawabnya) — dukung dengan output program. (Jingga)
+Jelaskan apa yang terjadi pada mapping saat sebuah node **keluar** dari ring (siapa yang mengambil alih tanggung jawabnya) — dukung dengan output program.
 
 ### Jawaban:
+Didapatkan output program sebagai berikut:
+```bash
+[JOIN] Node 'node-jakarta-1' (id=177) bergabung, alamat 10.0.0.1
+[JOIN] Node 'node-jakarta-2' (id=102) bergabung, alamat 10.0.0.2
+[JOIN] Node 'node-bandung-1' (id=40) bergabung, alamat 10.0.0.3
+[JOIN] Node 'node-surabaya-1' (id=136) bergabung, alamat 10.0.0.4
+```
+
+Berikut gambaran dari topologi ring
+```                        
+                     [ ID: 40 ]
+                    node-bandung-1
+                      (10.0.0.3)
+                      /        \
+                     /          \
+        [ ID: 177 ]                [ ID: 102 ]
+      node-jakarta-1              node-jakarta-2
+        (10.0.0.1)                  (10.0.0.2)
+              \                      /
+               \                    /
+          [ ID: 136 ] ------- [ ID: 123 ]
+        node-surabaya-1       node-medan-1
+          (10.0.0.4)           (10.0.0.5)
+
+```
+
+
+Node telah diurutkan ascending (terkecil ke terbesar) pada program node dengan id =  177 yaitu node-jakarta-1 akan keluar dari ring
+
+```bash
+[LEAVE] Node 'node-jakarta-1' (id=177) keluar dari ring
+```
+
+Selanjutnya, successor yang meneruskan pada lokasi terdekat dan bertanggung jawab adalah node-bandung-1, id = 40 karena ring melingkar sehingga node-bandung-1 akan mengambil seluruh wilayah dengan id = 137 - 177
+
+``` bash
+--- Sebuah node keluar ---
+[LEAVE] Node 'node-jakarta-1' (id=177) keluar dari ring
+kurir-001 -> 192.168.1.10
+kurir-002 -> 192.168.1.11
+```
+
+Karena kurir tidak ditugaskan pada node-jakarta-1 sehingga tidak memunculkan log pesan, sehingga keluarnya node tidak merusak struktur pencarian pada node-node lain yang masih aktif
+
 
 ## Struktur Submission
 
