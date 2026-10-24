@@ -5,8 +5,16 @@
 - Cara memperbaikinya: Menyimpan hasil pengurutan `self.nodes` ke dalam variabel baru bernama `nodes_id` menggunakan `sorted(self.nodes.keys())`, lalu mengembalikan nilai `nodes_id[0]`. Sehingga **find_successor** berhasil mengembalikan nilai node_id terkecil sesuai dengan konsep wrap_around.
 
 ## Skenario join/leave
-- Hasil sebelum & sesudah node baru bergabung: ...
-- Hasil sebelum & sesudah node keluar: ...
+- Hasil sebelum & sesudah node baru bergabung:
+    - Sebelum: ring berisi 4 node, yaitu node-bandung-1 (40), node-jakarta-2 (102), node-surabaya-1 (136), dan node-jakarta-1 (177). Kurir-001 (hash 50) disimpan di node-jakarta-2 (102), dan lookup kurir-001 menghasilkan 192.168.1.10.
+    - Sesudah: node-medan-1 (123) bergabung, sehingga ring berisi 5 node, yaitu 40, 102, 123, 136, dan 177. lookup kurir-001 tetap menghasilkan 192.168.1.10.
+    - Penjelasan: node 123 berada di antara node 102 dan node 136, jadi node 123 mengambil alih wilayah hash 103 sampai 123 dari successor lamanya, yaitu node-surabaya-1 (136). Tidak ada kurir yang hash-nya berada di rentang itu (kurir-002 = 28, kurir-001 = 50, kurir-003 = 132), sehingga tidak ada data yang berpindah.
+- Hasil sebelum & sesudah node keluar:
+    - Sebelum: ring berisi 5 node, yaitu 40, 102, 123, 136, dan 177. lookup kurir-001 menghasilkan 192.168.1.10 dan lookup kurir-002 menghasilkan 192.168.1.11.
+    - Sesudah: node-jakarta-1 (177) keluar, sehingga ring tinggal 4 node, yaitu 40, 102, 123, dan 136. Hasil lookup kurir-001 dan kurir-002 tetap sama.
+    - Penjelasan: node 177 tidak menyimpan data kurir mana pun, jadi tidak ada data yang perlu dipindahkan. Yang berpindah adalah wilayah tanggung jawabnya (hash 137 sampai 177). Karena tidak ada lagi node dengan hash di atas 136, aturan wrap-around berlaku dan wilayah itu diambil alih oleh node dengan hash terkecil, yaitu node-bandung-1 (40).
+      
+     Pada kedua skenario, hasil lookup tidak berubah karena kurir-001 dan kurir-002 tidak disimpan oleh node yang bergabung (node 123) ataupun yang keluar (node 177), sehingga tidak terpengaruh.
 
 ## Log Penggunaan AI (Level 2)
 
