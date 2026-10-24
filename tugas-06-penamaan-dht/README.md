@@ -2,6 +2,14 @@
 
 **Materi terkait:** Flat Naming, Structured Naming (DNS), Distributed Hash Table (DHT)/Chord.
 
+**Kelompok:** Kelompok 2
+
+| Nama | NIM |
+|---|---|
+| Neista Arsha Javana | 103072400067 | 
+| Nayyara Aurelia Putri | 103072400097 |
+| Jingga Jil Carissa | 103072400121 |
+
 ## Studi Kasus
 
 Pelanggan FoodGo kesulitan menemukan alamat IP server kurir yang **dinamis** (kurir berpindah lokasi/jaringan, IP-nya sering berubah). FoodGo butuh cara memetakan **ID Kurir** (identitas tetap) ke **alamat IP terkininya** tanpa server pusat tunggal yang jadi bottleneck/single point of failure.
@@ -26,7 +34,7 @@ python3 src/chord_simulation.py
 
 ## Tugas Analisis (`README.md`)
 
-Soal 1: Jelaskan **kenapa DHT/Chord** lebih cocok untuk kasus ini dibanding **flat naming sederhana** (mis. tabel pusat ID→IP) atau **DNS konvensional** — kaitkan dengan sifat "IP kurir sering berubah" dan kebutuhan tanpa titik gagal tunggal. (Neista)
+Soal 1: Jelaskan **kenapa DHT/Chord** lebih cocok untuk kasus ini dibanding **flat naming sederhana** (mis. tabel pusat ID→IP) atau **DNS konvensional** — kaitkan dengan sifat "IP kurir sering berubah" dan kebutuhan tanpa titik gagal tunggal.
 
 #### Jawaban No.1: 
 DHT (Distributed Hash Table) adalah cara menyimpan pasangan kunci dan nilai yang tersebar di banyak node, tanpa satu server pusat. Setiap node hanya menyimpan sebagian data, dan ada aturan yang membuat siapa pun bisa menghitung node mana yang menyimpan suatu data. Chord adalah salah satu cara membuat DHT. Pada Chord, ID kurir dan ID node di-hash ke rentang angka yang sama, lalu node disusun melingkar (ring) berdasarkan angka hashnya. Sebuah data disimpan di node pertama yang angkanya sama dengan atau lebih besar dari angka data itu (successor). Jika tidak ada node yang angkanya lebih besar, penelusuran kembali ke node dengan angka terkecil (wrap-around).
@@ -37,9 +45,76 @@ DNS (Domain Name System) adalah sistem yang menerjemahkan nama domain menjadi al
 
 Chord lebih cocok untuk kasus FoodGo karena dua alasan. Pertama, IP kurir sering berubah, dan setiap perubahan IP hanya perlu dikirim ke satu node penanggung jawab yang bisa dihitung dengan aturan successor. Dengan begitu, tidak ada server yang menerima seluruh pembaruan dan tidak ada cache yang menyimpan IP lama. Kedua, sistem harus berjalan tanpa titik gagal tunggal. Data kurir tersebar di banyak node dan tidak ada satu server pusat yang menentukan seluruh sistem. Saat node bergabung atau keluar, hanya data milik node itu yang berpindah, sehingga sistem tetap berjalan.
 
-Soal 2: Gambarkan (boleh pakai Mermaid, lihat Tugas 2) ring topology dari simulasi kalian, tandai node mana yang bertanggung jawab atas ID Kurir mana. (Nayya)
+Soal 2: Gambarkan (boleh pakai Mermaid, lihat Tugas 2) ring topology dari simulasi kalian, tandai node mana yang bertanggung jawab atas ID Kurir mana. 
 
 #### Jawaban No.2:
+- Ring Topology Simulasi 1 (kondisi awal node 40, 102, 136, dan 177 join)
+```mermaid
+graph LR
+  N40(node-bandung-1<br/>id=40<br/>10.0.0.3) 
+  N102(node-jakarta-2<br/>id=102<br/>10.0.0.2)
+  N136(node-surabaya-1<br/>id=136<br/>10.0.0.4)
+  N177(node-jakarta-1<br/>id=177<br/>10.0.0.1)
+
+  K1[kurir-001<br/>key=50]
+  K2[kurir-002<br/>key=28]
+  K3[kurir-003<br/>key=132]
+
+  N40-->|next| N102
+  N102 -->|next| N136
+  N136 -->|next| N177
+  N177 -->|wrap-around| N40
+  
+  N40 -->|menyimpan| K2
+  N102 -->|menyimpan| K1
+  N136 -->|menyimpan| K3
+```
+
+- Ring Topology Simulasi 2 (node 123 join)
+```mermaid
+graph LR
+  N40(node-bandung-1<br/>id=40<br/>10.0.0.3) 
+  N102(node-jakarta-2<br/>id=102<br/>10.0.0.2)
+  N136(node-surabaya-1<br/>id=136<br/>10.0.0.4)
+  N177(node-jakarta-1<br/>id=177<br/>10.0.0.1)
+  N123(node-medan-1<br/>id=123<br/>10.0.0.5 - baru)
+
+  K1[kurir-001<br/>key=50]
+  K2[kurir-002<br/>key=28]
+  K3[kurir-003<br/>key=132]
+
+  N40-->|next| N102
+  N102 -->|next| N123
+  N123 -->|next| N136
+  N136 -->|next| N177
+  N177 -->|wrap-around| N40
+  
+  N40 -->|menyimpan| K2
+  N102 -->|menyimpan| K1
+  N136 -->|menyimpan| K3
+```
+
+- Ring Topology Simulasi 3 (node 177 leave)
+```mermaid
+graph LR
+  N40(node-bandung-1<br/>id=40<br/>10.0.0.3) 
+  N102(node-jakarta-2<br/>id=102<br/>10.0.0.2)
+  N136(node-surabaya-1<br/>id=136<br/>10.0.0.4)
+  N123(node-medan-1<br/>id=123<br/>10.0.0.5)
+
+  K1[kurir-001<br/>key=50]
+  K2[kurir-002<br/>key=28]
+  K3[kurir-003<br/>key=132]
+
+  N40-->|next| N102
+  N102 -->|next| N123
+  N123 -->|next| N136
+  N136 -->|wrap-around| N40
+  
+  N40 -->|menyimpan| K2
+  N102 -->|menyimpan| K1
+  N136 -->|menyimpan| K3
+```
 
 Soal 3: Jelaskan apa yang terjadi pada mapping saat sebuah node **keluar** dari ring (siapa yang mengambil alih tanggung jawabnya) — dukung dengan output program.
 
