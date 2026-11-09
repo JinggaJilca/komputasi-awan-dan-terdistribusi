@@ -11,6 +11,16 @@ Data saldo *e-wallet* pelanggan FoodGo berbeda antara server wilayah **Jakarta**
 ### Bagian 1 — Analisis (wajib)
 
 1. Tentukan: apakah kasus ini **membutuhkan Sequential Consistency** (semua replika melihat urutan operasi yang sama) atau **cukup Eventual Consistency** (replika akan konsisten "pada akhirnya", boleh sementara berbeda)? Berikan argumen berbasis dampak bisnis (mis. kasus saldo *e-wallet* jauh lebih sensitif dibanding kasus "jumlah like" di media sosial).
+
+    Jawaban:
+
+    Pada kasus ini, Eventual Consistency saja tidak cukup. Eventual Consistency hanya menjamin bahwa semua replika akan sama pada akhirnya, tanpa menjamin berapa lama waktu yang dibutuhkan. Selama menunggu, Jakarta dan Bandung boleh menyimpan saldo yang berbeda. Itulah yang terjadi pada kasus FoodGo, yaitu pelanggan top-up di Jakarta, tetapi beberapa detik kemudian Bandung masih menyimpan saldo lama. Sistem ini menggunakan prinsip Eventual Consistency, karena Bandung boleh terlambat. Maka dari itu, Eventual Consistency saja tidak cukup, karena aturannya membolehkan kejadian yang menimbulkan masalah, yaitu keterlambatan update saldo.
+
+    Dampak bisnisnya, jika saldo yang terbaca salah, transaksi yang seharusnya berhasil malah ditolak, sehingga pelanggan kehilangan pesanan dan merasa uangnya hilang. Pada akhirnya pelanggan kehilangan kepercayaan, dan FoodGo kehilangan penjualan. Eventual Consistency lebih cocok untuk data seperti jumlah like di media sosial, karena jika jumlah like terlambat beberapa detik, tidak ada yang dirugikan dan tidak ada keputusan penting yang bergantung pada angka tersebut. Untuk data keuangan, model Eventual Consistency kurang cocok.
+
+    Jika menggunakan Sequential Consistency, semua server harus sepakat pada urutan operasi yang sama sebelum operasi dianggap selesai. Namun, biaya Sequential Consistency relatif mahal. Setiap pembaruan data harus menunggu konfirmasi dari server lain, padahal server berada di kota yang berbeda dan jaraknya menambah delay. Hal tersebut dapat membuat aplikasi menjadi lambat, dan jika koneksi antara Jakarta dan Bandung terganggu, pembaruan data bisa terhambat. Padahal, masalah di kasus FoodGo sebenarnya lebih sempit daripada yang diselesaikan Sequential Consistency. Yang dikeluhkan adalah pelanggan tidak melihat top-up miliknya sendiri, bukan seluruh server harus selalu sepakat soal setiap operasi. Karena itu, kebutuhan kasus ini berada di antara keduanya, yaitu tidak cukup jika hanya Eventual Consistency, tetapi tidak harus sampai Sequential Consistency. Pelanggan perlu dijamin selalu melihat data terbarunya sendiri, dan jaminan tersebut bisa diberikan lewat Client-Centric Consistency, yaitu Read-Your-Writes.
+
+
 2. Jika kalian menyimpulkan Eventual Consistency saja **tidak cukup** untuk skenario ini, usulkan pendekatan **Client-Centric Consistency** yang relevan (mis. *Read-Your-Writes*: pelanggan yang baru top-up harus selalu melihat saldo terbarunya sendiri, walau replika lain belum sinkron).
 3. Gambarkan **diagram alir urutan (sequence diagram)** yang menunjukkan operasi read/write antara pelanggan, server Jakarta, server Bandung, dan proses replikasi — untuk skenario **tanpa** jaminan konsistensi (bug terjadi) DAN skenario **dengan** solusi yang kalian usulkan (bug teratasi). Pakai Mermaid (`sequenceDiagram`) di `README.md` — lihat contoh cara pakai di Tugas 2.
 
