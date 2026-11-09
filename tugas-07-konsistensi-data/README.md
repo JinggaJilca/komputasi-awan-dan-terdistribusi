@@ -113,4 +113,4 @@ Jika sistem **tidak menjamin** *Monotonic Writes*, urutan eksekusi penulisan dar
 
 Model **Monotonic Writes** menjamin aturan bahwa jika operasi $W_1$ dilakukan sebelum $W_2$ oleh klien yang sama, maka di replika mana pun $W_1$ **diwajibkan diproses terlebih dahulu** sebelum $W_2$.
 
-Pada aplikasi LMS terdistribusi, **Monotonic Writes** memastikan bahwa dependensi antar-operasi penulisan yang dilakukan oleh seorang pengguna (seperti dosen yang membuat tugas lalu menambahkan catatan) akan diproses dalam **urutan kausalitas logis yang sama** di seluruh replika server.  
+Pada aplikasi LMS terdistribusi, **Monotonic Writes** memastikan bahwa dependensi antar-operasi penulisan yang dilakukan oleh seorang pengguna (seperti dosen yang membuat tugas lalu menambahkan catatan) akan diproses dalam **urutan kausalitas logis yang sama** di seluruh replika server.
