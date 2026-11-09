@@ -22,6 +22,17 @@ Data saldo *e-wallet* pelanggan FoodGo berbeda antara server wilayah **Jakarta**
 
 
 2. Jika kalian menyimpulkan Eventual Consistency saja **tidak cukup** untuk skenario ini, usulkan pendekatan **Client-Centric Consistency** yang relevan (mis. *Read-Your-Writes*: pelanggan yang baru top-up harus selalu melihat saldo terbarunya sendiri, walau replika lain belum sinkron).
+
+    Jawaban:
+
+    Pendekatan yang kami usulkan adalah Read-Your-Writes. Alasannya adalah karena bug di kasus ini terjadi karena pelanggan tidak melihat hasil top-up miliknya sendiri. Read-Your-Writes dapat menjamin pelanggan yang baru mengubah datanya, misalnya top-up saldo, selalu melihat hasil perubahannya sendiri, walau server lain belum sinkron. Pendekatan ini lebih ringan daripada Sequential Consistency, karena jaminannya hanya berlaku untuk pelanggan yang bersangkutan dan server tidak perlu saling menunggu pada setiap operasi.
+
+    Cara kerjanya dapat diterapkan dengan menggunakan nomor versi. Setiap kali saldo berubah, server yang menerima penulisan memberi nomor versi baru pada saldo tersebut. Contohnya, saldo pelanggan berada di versi 5, lalu ketika top-up di Jakarta, nomor versinya menjadi 6. Server Jakarta mengirim nomor versi 6 kembali ke aplikasi pelanggan, dan aplikasi menyimpannya sebagai bukti bahwa pelanggan tersebut sudah mengubah data sampai versi 6. Setiap kali aplikasi membaca saldo atau memesan makanan, aplikasi menyertakan nomor versi terakhir yang disimpannya.
+
+    Saat permintaan tersebut sampai di server Bandung, server memeriksa versi saldo di dalam salinannya. Jika versinya sudah 6 atau lebih baru, Bandung langsung menjawab. Jika versinya masih 5, berarti pembaruan dari Jakarta belum sampai. Server Bandung tidak boleh menjawab dengan saldo lama, dan ada dua pilihan. Pilihan yang pertama, Bandung menunggu beberapa saat sampai pembaruan tiba, lalu menjawab. Pilihan kedua, Bandung meneruskan permintaan ke Jakarta untuk mengambil saldo terbaru. Dengan begitu, pelanggan yang baru top-up tidak pernah ditolak karena saldo lama.
+
+    Pelanggan lain yang tidak baru memperbarui tidak terkena aturan ini. Pelanggan lain tetap dilayani langsung oleh server terdekat tanpa menunggu, sehingga aplikasi tetap cepat. Hanya pelanggan yang baru top-up yang mungkin menunggu sebentar, dan itu hanya terjadi saat pembaruan belum selesai. Namun, Read-Your-Writes memiliki batasan, Read-Your-Writes hanya menjamin satu pelanggan melihat perubahannya sendiri, dan tidak mencegah dua server mengubah saldo yang sama pada waktu bersamaan, sehingga salah satu perubahan bisa tertimpa. Karena itu, untuk operasi yang memotong saldo, misalnya pembayaran, sebaiknya perubahan selalu diproses di satu server utama milik pelanggan tersebut, sehingga urutannya jelas dan tidak bertabrakan.
+
 3. Gambarkan **diagram alir urutan (sequence diagram)** yang menunjukkan operasi read/write antara pelanggan, server Jakarta, server Bandung, dan proses replikasi — untuk skenario **tanpa** jaminan konsistensi (bug terjadi) DAN skenario **dengan** solusi yang kalian usulkan (bug teratasi). Pakai Mermaid (`sequenceDiagram`) di `README.md` — lihat contoh cara pakai di Tugas 2.
 
 ### Bagian 2 — Simulasi (opsional, nilai tambah)
