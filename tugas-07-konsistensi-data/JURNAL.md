@@ -28,4 +28,4 @@ Top up dilakukan pada sever Jakarta saldo = 7000.0, version = 2 dengan durasi de
 
 | Tanggal | Tool AI | Prompt yang diberikan | Ringkasan saran/ide AI | Bagaimana diolah jadi tulisan/kode sendiri |
 |---|---|---|---|---|
-| ... | ... | ... | ... | ... |
+| 09 November 2026 | Claude | Apa saja jenis Client-Centric Consistency? | Menjelaskan empat model (Monotonic Reads, Monotonic Writes, Read-Your-Writes, Writes Follow Reads) beserta contohnya. | Dipakai untuk memilih model yang relevan dengan kasus saldo. |
