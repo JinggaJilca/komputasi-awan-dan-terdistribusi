@@ -2,6 +2,14 @@
 
 **Materi terkait:** Data-Centric Consistency (Sequential, Eventual), Client-Centric Consistency.
 
+**Kelompok:** Kelompok 2
+
+| Nama | NIM |
+|---|---|
+| Neista Arsha Javana | 103072400067 | 
+| Nayyara Aurelia Putri | 103072400097 |
+| Jingga Jil Carissa | 103072400121 | 
+
 ## Studi Kasus
 
 Data saldo *e-wallet* pelanggan FoodGo berbeda antara server wilayah **Jakarta** dan **Bandung** karena replikasi antar server berjalan lambat. Contoh kasus nyata: pelanggan top-up saldo lewat server Jakarta, lalu dalam hitungan detik memesan makanan lewat aplikasi yang tersambung ke server Bandung — saldo belum ter-update, transaksi ditolak padahal saldo sebenarnya cukup.
