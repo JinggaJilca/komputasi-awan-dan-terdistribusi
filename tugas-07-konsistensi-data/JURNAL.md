@@ -8,9 +8,9 @@
 2. Eventual Consistency
    - Kelebihan: Ketersediaan tinggi, latensi rendah, dan mudah diskalakan lintas wilayah karena server tidak perlu menunggu proses replikasi selesai sebelum melayani pengguna.
    - Kekurangan: Server dapat membaca saldo lama, urutan pembaruan dapat berbeda antar-replika, konflik penulisan berisiko menghilangkan data, dan beban penanganan inkonsistensi berpindah ke logika aplikasi.
-3. Pertimbangan dampak bisnis: Saldo e-wallet merupakan data yang sangat sensitif, sehingga ketidaksesuaian saldo antar-server dapat menyebabkan transaksi ditolak meski saldo cukup, saldo tercatat salah, atau pesanan yang lolos dengan saldo yang sama. Akibatnya FoodGo berisiko kehilangan dana dan kepercayaan pelanggan, menanggung klaim ganti rugi, serta melanggar kewajiban pencatatan keuangan yang akurat dan dapat diadit. Kerugian ini lebih besar dibandingkan dengan kerugian pada data non-kritis seperti jumlah like.
+3. Pertimbangan dampak bisnis: Saldo e-wallet merupakan data yang sangat sensitif, sehingga ketidaksesuaian saldo antar-server dapat menyebabkan transaksi ditolak meski saldo cukup, saldo tercatat salah, atau pesanan yang lolos dengan saldo yang sama. Akibatnya FoodGo berisiko kehilangan dana dan kepercayaan pelanggan, menanggung klaim ganti rugi, serta melanggar kewajiban pencatatan keuangan yang akurat dan dapat diaudit. Kerugian ini lebih besar dibandingkan dengan kerugian pada data non-kritis seperti jumlah like.
 
-- Kesimpulan akhir & alasan: Kami menyimpulkan bahwa Eventual Consistency tidak cukup untuk data saldo e-wallet FoodGo. Replikasi yang lambat antara server Jakarta dan Bandung membuat pelanggan yang baru top-up masih melihat saldo yang lama. Kondisi ini berdampak langsung pada bisnis, yaitu hilangnya pesanan dan menurunnya kepercayaan pelanggan. Karena itu, Sequential Consistency diperlukan untuk operasi saldo agar semua server sepakat pada satu urutan operasi yang sama. Sebagai pelengkap, kami menerapkan Read-Your-Writes sebagai pendekatan client-centric, sehingga pelanggan yang baru top-up dapat melihat saldo terbarunya meskipun terhubung ke server yang berbeda. 
+- Kesimpulan akhir & alasan: Kami menyimpulkan bahwa Eventual Consistency tidak cukup untuk data saldo e-wallet FoodGo. Replikasi yang lambat antara server Jakarta dan Bandung membuat server Bandung masih membaca saldo lama ketika pelanggan yang baru top-up memesan makanan, sehingga transaksi ditolak padahal saldo sebenarnya cukup. Kondisi ini berdampak langsung pada bisnis, yaitu hilangnya pesanan dan menurunnya kepercayaan pelanggan. Karena itu, Sequential Consistency diperlukan untuk operasi saldo agar semua server sepakat pada satu urutan operasi yang sama. Sebagai pelengkap, kami menerapkan Read-Your-Writes sebagai pendekatan client-centric consistency, sehingga pelanggan yang baru top-up dapat melihat saldo terbarunya meskipun terhubung ke server yang berbeda. Trade-off berupa latensi akibat proses sinkronisasi data mutakhir oleh server dapat ditoleransi demi memprioritaskan keamanan transaksi. 
 
 ## Simulasi
 - Skenario Naif
@@ -19,9 +19,6 @@ Ketika top-up pada server Jakarta saldo = 50000.0, version = 1 replikasi server 
 - Skenario Read Your Write
 Top up dilakukan pada sever Jakarta saldo = 7000.0, version = 2 dengan durasi delay jaringan selama 2,0 detik. Saat pembacaan dipanggil dari server Bandung sebelum replikasi selesai (t < 2,0 detik), mekanisme baca_saldo_read_your_writes secara proaktif memeriksa versi data di server tujuan. Karena versi di Bandung masih usang (version 1 < 2), sistem menahan pembacaan (polling wait) hingga thread replikasi memperbarui server Bandung ke version = 2. Setelah replikasi tiba, fungsi baru melepaskan nilainya dan mengembalikan angka saldo yang konsisten dan akurat, yaitu 70000.0
 
-
-
-
 ## Log Penggunaan AI (Level 2)
 
 > Wajib diisi sesuai kebijakan Level 2 di [`../RUBRIK-UMUM.md`](../RUBRIK-UMUM.md). Tulis "Tidak memakai AI" pada baris pertama jika memang tidak dipakai. Hanya untuk brainstorming ide/outline — bukan untuk kode/analisis/teks akhir.
@@ -29,4 +26,4 @@ Top up dilakukan pada sever Jakarta saldo = 7000.0, version = 2 dengan durasi de
 | Tanggal | Tool AI | Prompt yang diberikan | Ringkasan saran/ide AI | Bagaimana diolah jadi tulisan/kode sendiri |
 |---|---|---|---|---|
 | 09 November 2026 | Claude | Apa saja jenis Client-Centric Consistency? | Menjelaskan empat model (Monotonic Reads, Monotonic Writes, Read-Your-Writes, Writes Follow Reads) beserta contohnya. | Dipakai untuk memilih model yang relevan dengan kasus saldo. |
-| 09 November 2026 | Claude | Jelaskan konsep sequential dan eventual consistency beserta analogi sehari-hari. | Menjelaskan konsep, tabel perbandingan, dan kaitannya dengan teorema CAP | Memahami konsep dan analogi dari sequential dan eventual consistency. | 
+| 09 November 2026 | Claude | Jelaskan konsep sequential dan eventual consistency beserta analogi sehari-hari. | Menjelaskan konsep, tabel perbandingan, dan kaitannya dengan teorema CAP. | Memahami konsep dan analogi dari sequential dan eventual consistency. | 
