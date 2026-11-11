@@ -35,6 +35,75 @@ Data saldo *e-wallet* pelanggan FoodGo berbeda antara server wilayah **Jakarta**
 
 3. Gambarkan **diagram alir urutan (sequence diagram)** yang menunjukkan operasi read/write antara pelanggan, server Jakarta, server Bandung, dan proses replikasi — untuk skenario **tanpa** jaminan konsistensi (bug terjadi) DAN skenario **dengan** solusi yang kalian usulkan (bug teratasi). Pakai Mermaid (`sequenceDiagram`) di `README.md` — lihat contoh cara pakai di Tugas 2.
 
+    Jawaban:
+- Skenario 1 **tanpa** jaminan konsistensi (terjadi bug)
+```mermaid
+sequenceDiagram
+   autonumber
+   actor P as Pelanggan
+   participant J as Server Jakarta
+   participant R as Proses Replikasi
+   participant B as Server Bandung
+
+   note over P, B: Saldo awal Rp50.000 di Jakarta dan Bandung
+
+   P->>J: (WRITE) top-up Rp150.000
+   J->>J: (UPDATE) saldo Rp200.000
+   J-->>P: (OK) saldo Rp200.000
+   J->>R: kirim update saldo (asinkron)
+
+   note over R: Replikasi lambat, update belum sampai ke Bandung
+
+   P->>B: (WRITE) pesan makanan Rp130.000
+   B->>B: (READ) saldo replika lokal Rp50.000 (data lama)
+   B-->>P: (REJECT) saldo tidak cukup
+   R-->>B: (UPDATE) saldo Rp200.000 (terlambat)
+
+   note over P, B: Bug: transaksi ditolak padahal saldo sebenarnya cukup
+```
+- Skenario 2 **dengan** jaminan konsistensi (bug teratasi)
+
+```mermaid
+sequenceDiagram
+   autonumber
+   actor P as Pelanggan
+   participant J as Server Jakarta
+   participant R as Proses Replikasi
+   participant B as Server Bandung
+
+   note over P, B: Saldo awal Rp50.000 di Jakarta dan Bandung
+
+   P->>J: (WRITE) top-up Rp150.000
+   J->>J: (UPDATE) saldo menjadi Rp200.000
+   J-->>P: (OK) saldo Rp200.000 + token sesi
+   J->>R: kirim update saldo (asinkron)
+
+   note over R: Replikasi masih lambat
+
+   P->>B: (WRITE) pesan makanan Rp130.000 + token sesi
+   B->>B: (CHECK) update top-up sudah ada di replika lokal?
+
+   note over B: Belum ada, saldo masih Rp50.000
+
+   alt Opsi A: menunggu replikasi
+      R-->>B: (UPDATE) saldo Rp200.000
+   else Opsi B: teruskan pembacaan ke Jakarta
+      B->>J: (READ) saldo terbaru
+      J-->>B: (OK) saldo Rp200.000
+   end
+
+   note over B: Syarat Read-Your-Writes terpenuhi
+   B->>B: (CHECK) saldo Rp200.000 cukup untuk Rp130.000?
+
+   B->>J: (WRITE) debit Rp130.000
+   J->>J: (UPDATE) saldo Rp70.000
+   J-->>B: (OK) saldo Rp70.000
+   B-->>P: (OK) pesanan diterima
+   J->>R: kirim update saldo (asinkron)
+
+   note over P, B: Bug teratasi: pelanggan dapat melihat saldo setelah top-up, urutan operasi saldo tetap terjaga
+```
+
 ### Bagian 2 — Simulasi (opsional, nilai tambah)
 
 Skeleton `src/replica_simulation.py` mensimulasikan dua replika (Jakarta & Bandung) dengan delay replikasi buatan. Lengkapi TODO untuk:
